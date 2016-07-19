@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nGTPDispatcherData mode="choice" choiceclass="NGTPDispatcherData"
+	class="NGTPDispatcherData" type="arraychoice" ndfun="getChosenFlag"
+	fun="" asnclass="net.sirun.ngtp.ngtp_dispatch">
+
+	<uplink type="object" fun="getChosenValue" choice="1"
+		class="UplinkNGTPDispatcherData">
+		<common type="object" class="NGTPDispatcherDataCommon">
+			<eventInitiator mode="2ndValue" ndfun="longValue"
+				type="integer" class="EventInitiator"></eventInitiator>
+			<eventCreationTime type="object" class="TimeStamp">
+				<seconds type="integer"></seconds>
+				<millis type="integer"></millis>
+			</eventCreationTime>
+			<serviceType type="integer"></serviceType>
+			<messageType mode="2ndValue" class="DSPTMessageType"
+				type="integer" ndfun="longValue"></messageType>
+			<dsptAckRequired type="boolean"></dsptAckRequired>
+			<statelessNGTPmessage type="boolean"></statelessNGTPmessage>
+			<mobileId type="object" class="MobileDeviceIdentifier">
+				<publicAddress type="printablestring"></publicAddress>
+				<equipmentIdentifier type="printablestring"></equipmentIdentifier>
+				<subscriberIdentity type="printablestring"></subscriberIdentity>
+				<iccId type="printablestring"></iccId>
+			</mobileId>
+			<challenge type="byte"></challenge>
+		</common>
+		<extension type="object" class="UplinkNGTPDispatcherDataExtension">
+			<crqmRequest type="boolean"></crqmRequest>
+			<messagePendingCheck type="boolean"></messagePendingCheck>
+			<basicPosition type="object" class="BasicPosition">
+				<latitude type="integer"></latitude>
+				<longitude type="integer"></longitude>
+			</basicPosition>
+			<currentNetwork type="printablestring"></currentNetwork>
+			<homeNetwork type="printablestring"></homeNetwork>
+			<hmiLanguage type="printablestring"></hmiLanguage>
+			<serviceDataMessageLength mode="choice"
+				ndfun="getChosenFlag" type="object" choiceclass="MessageLength">
+				<messageLength8 type="integer" fun="getChosenValue"
+					choice="1"></messageLength8>
+				<messageLength16 type="integer" fun="getChosenValue"
+					choice="2"></messageLength16>
+				<messageLength24 type="integer" fun="getChosenValue"
+					choice="3"></messageLength24>
+
+			</serviceDataMessageLength>
+			<serviceDataEncoding type="object" class="DataEncoding">
+				<encodingType mode="2ndValue" class="EncodingType"
+					type="integer" ndfun="longValue"></encodingType>
+				<encodingVersion type="object" class="MajMinVersion6">
+					<majorVersion type="integer"></majorVersion>
+					<minorVersion type="integer"></minorVersion>
+				</encodingVersion>
+			</serviceDataEncoding>
+			<serviceDataProtocolVersion class="MajMinVersion16"
+				type="object">
+				<majorVersion mode="2ndValue" type="integer" ndfun="longValue"
+					class="ProtocolVersionSingle8" setmode="2ndValue"></majorVersion>
+				<minorVersion mode="2ndValue" type="integer" ndfun="longValue"
+					class="ProtocolVersionSingle8" setmode="2ndValue"></minorVersion>
+			</serviceDataProtocolVersion>
+		</extension>
+
+	</uplink>
+	<downlink type="object" fun="getChosenValue" choice="2"
+		class="DownlinkNGTPDispatcherData">
+		<common type="object" class="NGTPDispatcherDataCommon">
+			<eventInitiator mode="2ndValue" ndfun="longValue"
+				type="integer" class="EventInitiator"></eventInitiator>
+			<eventCreationTime type="object" class="TimeStamp">
+				<seconds type="integer"></seconds>
+				<millis type="integer"></millis>
+			</eventCreationTime>
+			<serviceType type="integer"></serviceType>
+			<messageType mode="2ndValue" class="DSPTMessageType"
+				type="integer" ndfun="longValue"></messageType>
+			<dsptAckRequired type="boolean"></dsptAckRequired>
+			<statelessNGTPmessage type="boolean"></statelessNGTPmessage>
+			<mobileId type="object" class="MobileDeviceIdentifier">
+				<publicAddress type="printablestring"></publicAddress>
+				<equipmentIdentifier type="printablestring"></equipmentIdentifier>
+				<subscriberIdentity type="printablestring"></subscriberIdentity>
+				<iccId type="printablestring"></iccId>
+			</mobileId>
+			<challenge type="byte"></challenge>
+		</common>
+		<extension type="object" class="DownlinkNGTPDispatcherDataExtension">
+			<serviceDataMessageLength mode="choice"
+				type="object"  choiceclass="MessageLength">
+				<messageLength8 fun="getChosenValue" type="integer" choice="1"></messageLength8>
+				<messageLength16 fun="getChosenValue" type="integer" choice="2"></messageLength16>
+				<messageLength24 fun="getChosenValue" type="integer" choice="3"></messageLength24>
+
+			</serviceDataMessageLength>
+			<serviceDataEncoding type="object" class="serviceDataEncoding">
+				<encodingType mode="2ndValue" class="EncodingType"
+					type="integer" ndfun="longValue"></encodingType>
+				<encodingVersion type="object" class="MajMinVersion6">
+					<majorVersion type="integer"></majorVersion>
+					<minorVersion type="integer"></minorVersion>
+				</encodingVersion>
+			</serviceDataEncoding>
+			<serviceDataProtocolVersion class="MajMinVersion16"
+				type="object">
+				<majorVersion type="integer"></majorVersion>
+				<minorVersion type="integer"></minorVersion>
+			</serviceDataProtocolVersion>
+
+		</extension>
+
+	</downlink>
+	<control type="object" fun="getChosenValue" choice="3"
+		class="ControlNGTPDispatcherData">
+		<common type="object" class="NGTPDispatcherDataCommon">
+			<eventInitiator mode="2ndValue" ndfun="longValue"
+				type="integer" class="EventInitiator"></eventInitiator>
+			<eventCreationTime type="object" class="TimeStamp">
+				<seconds type="integer"></seconds>
+				<millis type="integer"></millis>
+			</eventCreationTime>
+			<serviceType type="integer"></serviceType>
+			<messageType mode="2ndValue" class="DSPTMessageType"
+				type="integer" ndfun="longValue"></messageType>
+			<dsptAckRequired type="boolean"></dsptAckRequired>
+			<statelessNGTPmessage type="boolean"></statelessNGTPmessage>
+			<mobileId type="object" class="MobileDeviceIdentifier">
+				<publicAddress type="printablestring"></publicAddress>
+				<equipmentIdentifier type="printablestring"></equipmentIdentifier>
+				<subscriberIdentity type="printablestring"></subscriberIdentity>
+				<iccId type="printablestring"></iccId>
+			</mobileId>
+			<challenge type="byte"></challenge>
+		</common>
+		<extension type="object" class="ControlNGTPDispatcherDataExtension">
+			<crqNumber type="printablestring"></crqNumber>
+			<notificationData type="byte"></notificationData>
+			<messagesPending type="boolean"></messagesPending>
+			<errorInfo mode="2ndValue" type="integer" ndfun="longValue"
+				class="NGTPErrorCodes"></errorInfo>
+		</extension>
+
+	</control>
+
+</nGTPDispatcherData>

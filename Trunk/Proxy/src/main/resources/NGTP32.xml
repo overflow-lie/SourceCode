@@ -1,0 +1,1671 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- type为当前值的类型,fun为获取值调用方法 -->
+<!-- mode为非常用选项,用于二层值,或者选择结构,可以忽略,默认值为正常 -->
+<NGTPServiceData type="object" fun=""
+	asnclass="net.sirun.ngtp.ngtp_service_data">
+
+	<testFlag type="boolean" fun="getTestFlag" class="Boolean"></testFlag>
+	<!-- 当前方法为2级值模式,2级值是说当前对象是Object,但后面一层为枚举对象,这是将在上一级放入值 -->
+	<messageType mode="2ndValue" type="integer" fun="getMessageType"
+		class="ServiceMessageType" ndfun="longValue"></messageType>
+	<appAck mode="2ndValue" type="integer" ndfun="longValue" fun="getAppAck"
+		class="Acknowledge"></appAck>
+	<appAckRequired type="boolean" fun="getAppAckRequired"></appAckRequired>
+
+
+	<!-- mode 为choice时,说明当前内部有且只有一个会被选择 ndfun为选择获取值的方法 -->
+	<serviceDataCoreMessage mode="choice"
+		fun="getServiceDataCoreMessage" ndfun="getChosenFlag" type="object"
+		choiceclass="NGTPCore">
+		<!-- choice值为当前参数的顺序 (此顺序基于选择的flag) -->
+		<uplink type="object" fun="getChosenValue" choice="1"
+			class="NGTPUplinkCore">
+
+			<positionExtension type="object" class="ExtendedPosition">
+				<altitudeMtr type="integer"></altitudeMtr>
+				<headingDeg type="integer"></headingDeg>
+				<reliability type="object" class="PositionReliability">
+					<fixType mode="2ndValue" type="integer" ndfun="longValue"
+						class="GnssFixType"></fixType>
+					<insideDigitizedArea mode="2ndValue" type="integer"
+						ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+					<fullyDigitizedArea mode="2ndValue" type="integer"
+						ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+					<matchedToDigitalMap mode="2ndValue" type="integer"
+						ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+					<deadReckoning mode="2ndValue" type="integer" ndfun="longValue"
+						class="BOOLEXT"></deadReckoning>
+					<drCalibrated mode="2ndValue" type="integer" ndfun="longValue"
+						class="BOOLEXT"></drCalibrated>
+					<drDistanceMtr type="integer"></drDistanceMtr>
+					<hdopx10 type="integer"></hdopx10>
+					<noOfSatellites type="integer"></noOfSatellites>
+					<differentialGPSAvailable mode="2ndValue"
+						type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+				</reliability>
+				<fixtime type="object" class="TimeStamp">
+					<seconds type="integer"></seconds>
+				</fixtime>
+				<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+
+			</positionExtension>
+			<vehicleStatus type="object" class="BasicVehicleStatus">
+				<state mode="2ndValue" type="integer" ndfun="longValue" class="VehicleStateType"></state>
+				<mainBattery mode="2ndValue" type="integer" ndfun="longValue"
+					class="MainBatteryStatus"></mainBattery>
+				<theftAlarm mode="2ndValue" type="integer" ndfun="longValue"
+					class="TheftAlarmStatus"></theftAlarm>
+				<engineBlock mode="2ndValue" type="integer" ndfun="longValue"
+					class="EngineBlockedStatus"></engineBlock>
+				<brazilEventMode mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></brazilEventMode>
+				<srs mode="2ndValue" type="integer" ndfun="longValue" class="SRSStatus"></srs>
+				<fuelLevelPerc type="integer"></fuelLevelPerc>
+
+			</vehicleStatus>
+			<extendedVehicleStatus type="object"
+				class="ExtendedVehicleStatus">
+				<panicAlarmTriggered mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></panicAlarmTriggered>
+				<crashSituation mode="2ndValue" type="integer" ndfun="longValue"
+					class="BOOLEXT"></crashSituation>
+				<batteryVoltx10 type="integer"></batteryVoltx10>
+				<windowStatus mode="object" type="integer" ndfun="longValue"
+					class="WindowStatuses">
+					<front_left mode="2ndValue" type="integer" ndfun="longValue"
+						class="WindowStatus"></front_left>
+					<front_right mode="2ndValue" type="integer" ndfun="longValue"
+						class="WindowStatus"></front_right>
+					<rear_left mode="2ndValue" type="integer" ndfun="longValue"
+						class="WindowStatus"></rear_left>
+					<rear_right mode="2ndValue" type="integer" ndfun="longValue"
+						class="WindowStatus"></rear_right>
+				</windowStatus>
+				<doorStatus mode="object" type="integer" ndfun="longValue"
+					class="DoorStatuses">
+					<allDoorsLocked mode="2ndValue" type="integer"
+						ndfun="longValue" class="BOOLEXT"></allDoorsLocked>
+					<trunkLocked mode="2ndValue" type="integer" ndfun="longValue"
+						class="BOOLEXT"></trunkLocked>
+
+					<doorStatus mode="object" class="IndividualDoorStatuses"></doorStatus>
+					<front_left type="object" class="IndividualDoorStatuses">
+						<doorStatus type="integer" mode="2ndValue" class="DoorPosition"></doorStatus>
+						<lockStatus type="integer" mode="2ndValue" class="DoorLockStatus"></lockStatus>
+					</front_left>
+					<front_right type="object" class="IndividualDoorStatuses">
+						<doorStatus type="integer" mode="2ndValue" class="DoorPosition"></doorStatus>
+						<lockStatus type="integer" mode="2ndValue" class="DoorLockStatus"></lockStatus>
+					</front_right>
+					<rear_left type="object" class="IndividualDoorStatuses">
+						<doorStatus type="integer" mode="2ndValue" class="DoorPosition"></doorStatus>
+						<lockStatus type="integer" mode="2ndValue" class="DoorLockStatus"></lockStatus>
+					</rear_left>
+					<rear_right type="object" class="IndividualDoorStatuses">
+						<doorStatus type="integer" mode="2ndValue" class="DoorPosition"></doorStatus>
+						<lockStatus type="integer" mode="2ndValue" class="DoorLockStatus"></lockStatus>
+					</rear_right>
+					<tailgate type="object" class="IndividualDoorStatuses">
+						<doorStatus type="integer" mode="2ndValue" class="DoorPosition"></doorStatus>
+						<lockStatus type="integer" mode="2ndValue" class="DoorLockStatus"></lockStatus>
+					</tailgate>
+					<engineHood type="object" class="IndividualDoorStatuses">
+						<doorStatus type="integer" mode="2ndValue" class="DoorPosition"></doorStatus>
+						<lockStatus type="integer" mode="2ndValue" class="DoorLockStatus"></lockStatus>
+					</engineHood>
+				</doorStatus>
+				<cabOpenStatus mode="2ndValue" type="integer" ndfun="longValue"
+					class="BOOLEXT"></cabOpenStatus>
+				<sunroofOpenStatus mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></sunroofOpenStatus>
+				<bootOpenStatus mode="2ndValue" type="integer" ndfun="longValue"
+					class="BOOLEXT"></bootOpenStatus>
+				<fuelAmountDl type="integer"></fuelAmountDl>
+				<distToEmptyFuelKm type="integer"></distToEmptyFuelKm>
+				<odometerValue type="object" class="OdometerData">
+					<meterResolution type="boolean"></meterResolution>
+					<odometerValueMtr type="integer"></odometerValueMtr>
+				</odometerValue>
+				<tyreStatuses type="object" class="TyreStatuses">
+
+					<front_left type="object" class="TyreStatus">
+						<warning mode="2ndValue" type="integer" ndfun="longValue"
+							class="TyrePressureWarning"></warning>
+						<pressureHpa type="integer"></pressureHpa>
+					</front_left>
+					<front_right type="object" class="TyreStatus">
+						<warning mode="2ndValue" type="integer" ndfun="longValue"
+							class="TyrePressureWarning"></warning>
+						<pressureHpa type="integer"></pressureHpa>
+					</front_right>
+					<rear_left type="object" class="TyreStatus">
+						<warning mode="2ndValue" type="integer" ndfun="longValue"
+							class="TyrePressureWarning"></warning>
+						<pressureHpa type="integer"></pressureHpa>
+					</rear_left>
+					<rear_right type="object" class="TyreStatus">
+						<warning mode="2ndValue" type="integer" ndfun="longValue"
+							class="TyrePressureWarning"></warning>
+						<pressureHpa type="integer"></pressureHpa>
+					</rear_right>
+				</tyreStatuses>
+				<headLightOn mode="2ndValue" type="integer" ndfun="longValue"
+					class="BOOLEXT"></headLightOn>
+				<engineCoolantTempDeg type="integer"></engineCoolantTempDeg>
+				<vehicleDateTime type="object" class="TimeHM">
+					<hour type="integer"></hour>
+					<minute type="integer"></minute>
+				</vehicleDateTime>
+				<ecoGrade type="object" class="EcoGrade">
+					<propulsion type="integer"></propulsion>
+					<braking type="integer"></braking>
+				</ecoGrade>
+				<engHrsToSrvc type="integer"></engHrsToSrvc>
+				<kmToSrvc type="integer"></kmToSrvc>
+				<monthsToSrvc type="integer"></monthsToSrvc>
+				<srvcWarnStatus mode="2ndValue" type="integer" ndfun="longValue"
+					class="ServiceWarningStatus"></srvcWarnStatus>
+				<srvcWarnTrigger mode="2ndValue" type="integer"
+					ndfun="longValue" class="ServiceWarningTrigger"></srvcWarnTrigger>
+				<bulbFailures mode="2ndArray" type="2ndArray" ndfun="longValue"
+					arrayclass="ExtendedVehicleStatus$BulbFailures" class="Bulb"></bulbFailures>
+				<brakeFluidWarn mode="2ndValue" type="integer" ndfun="longValue"
+					class="LiquidLevelWarning"></brakeFluidWarn>
+				<engCoolantLevelWarn mode="2ndValue" type="integer"
+					ndfun="longValue" class="LiquidLevelWarning"></engCoolantLevelWarn>
+				<oilLevelWarn mode="2ndValue" type="integer" ndfun="longValue"
+					class="LiquidLevelWarning">></oilLevelWarn>
+				<washerFluidWarn mode="2ndValue" type="integer"
+					ndfun="longValue" class="LiquidLevelWarning"></washerFluidWarn>
+				<oilPressureWarn mode="2ndValue" type="integer"
+					ndfun="longValue" class="PressureWarning"></oilPressureWarn>
+				<tripMeter1 type="object" class="OdometerData">
+					<meterResolution type="boolean"></meterResolution>
+					<odometerValueMtr type="integer"></odometerValueMtr>
+				</tripMeter1>
+				<tripMeter2 type="object" class="OdometerData">
+					<meterResolution type="boolean"></meterResolution>
+					<odometerValueMtr type="integer"></odometerValueMtr>
+				</tripMeter2>
+				<avgSpeedKmph type="integer"></avgSpeedKmph>
+				<avgFuelConsCl mode="2ndValue" type="integer" ndfun="longValue"
+					class="AvgFuelConsumptionCl" setmode="2ndValue"></avgFuelConsCl>
+
+			</extendedVehicleStatus>
+			<dashboardStatus type="object" class="DashboardStatus">
+				<dummyForCompiling type="boolean"></dummyForCompiling>
+			</dashboardStatus>
+			<electricVehicleStatus type="object"
+				class="ElectricVehicleStatus">
+				<chargingProfile type="utf8string"></chargingProfile>
+				<isPreconditioning mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></isPreconditioning>
+				<isCharging mode="2ndValue" type="integer" ndfun="longValue"
+					class="BOOLEXT"></isCharging>
+				<isPluggedIn mode="2ndValue" type="integer" ndfun="longValue"
+					class="BOOLEXT"></isPluggedIn>
+				<distanceToEmptyKm type="integer"></distanceToEmptyKm>
+				<stateOfCharge type="integer"></stateOfCharge>
+				<timeToFullyChargedHrsx4 type="integer"></timeToFullyChargedHrsx4>
+				<chargeType mode="2ndValue" type="integer" ndfun="longValue"
+					class="ChargeType"></chargeType>
+			</electricVehicleStatus>
+			<climateStatus type="object" class="ClimateStatus">
+				<timerActivationStatus mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT">
+				</timerActivationStatus>
+				<timer1 type="object" class="ClimateTimer">
+					<month type="integer"></month>
+					<day type="integer"></day>
+					<time type="object" class="TimeHM">
+						<hour type="integer"></hour>
+						<minute type="integer"></minute>
+					</time>
+				</timer1>
+				<timer2 type="object" class="ClimateTimer">
+					<month type="integer"></month>
+					<day type="integer"></day>
+					<time type="object" class="TimeHM">
+						<hour type="integer"></hour>
+						<minute type="integer"></minute>
+					</time>
+				</timer2>
+				<climateOperatingStatus mode="2ndValue" type="integer"
+					ndfun="longValue" class="ClimateOperatingStatus"></climateOperatingStatus>
+				<remainingRunTime type="integer"></remainingRunTime>
+				<ventingTime type="integer"></ventingTime>
+			</climateStatus>
+			<tuStatus type="object" class="TelematicUnitStatus">
+				<power mode="2ndValue" type="integer" ndfun="longValue" class="TUPowerSource"></power>
+				<diagnostics type="object" class="TUDiagnosticData">
+					<speaker mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></speaker>
+					<mic mode="2ndValue" type="integer" ndfun="longValue" class="TUDiagnostic"></mic>
+					<extHandsfree mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></extHandsfree>
+					<handset mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></handset>
+					<gsmModem mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></gsmModem>
+					<gsmExtAntenna mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></gsmExtAntenna>
+					<extPower mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></extPower>
+					<intPower mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></intPower>
+					<gnss mode="2ndValue" type="integer" ndfun="longValue" class="TUDiagnostic"></gnss>
+					<gnssAntenna mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></gnssAntenna>
+					<can mode="2ndValue" type="integer" ndfun="longValue" class="TUDiagnostic"></can>
+					<buttons mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></buttons>
+					<crashInput mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></crashInput>
+					<intRtc mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUDiagnostic"></intRtc>
+					<troubleCodes mode="array" type="object"
+						arrayclass="TUDiagnosticData$TroubleCodes" class="DiagnosticTroubleCode">
+						<dtcId type="integer"></dtcId>
+						<!-- 被误杀了 -->
+						<node mode="choice" type="object" ndfun="getChosenFlag"
+							class="Node" choiceclass="DiagnosticTroubleCode$Node" subchoicemode="False">
+							<telematicUnit type="null" fun="getChosenValue"
+								choice="1" class="null"></telematicUnit>
+							<id type="integer" fun="getChosenValue" choice="2"></id>
+						</node>
+						<status type="bitstring" ndfun="getSize" class="DtcStatusBitsIso14229"></status>
+						<failureCount type="integer"></failureCount>
+						<lastFail type="object" class="TimeStamp">
+							<seconds type="integer"></seconds>
+						</lastFail>
+					</troubleCodes>
+					<daysSinceGnssFix type="integer"></daysSinceGnssFix>
+				</diagnostics>
+				<battery type="object" class="TUBackupBatteryStatus">
+					<primaryVoltx10 type="integer"></primaryVoltx10>
+					<primaryChargePerc type="integer"></primaryChargePerc>
+					<secondaryVoltx10 type="integer"></secondaryVoltx10>
+					<secondaryChargePerc type="integer"></secondaryChargePerc>
+				</battery>
+				<mobilePhoneConnected mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></mobilePhoneConnected>
+				<sleepCyclesStartTime type="object" class="TimeStamp">
+					<seconds type="integer"></seconds>
+				</sleepCyclesStartTime>
+				<configVersion type="integer" mode="2ndValue" ndfun="longValue"
+					class="TuConfigVersion" setmode="2ndValue"></configVersion>
+				<activation mode="2ndValue" type="integer" ndfun="longValue"
+					class="TuActivationStatus"></activation>
+				<usesExternalGnss mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></usesExternalGnss>
+				<hwVersion type="printablestring"></hwVersion>
+				<swVersionMain type="printablestring"></swVersionMain>
+				<swVersionSecondary type="printablestring"></swVersionSecondary>
+				<swVersionConfiguration type="printablestring"></swVersionConfiguration>
+				<serialNumber type="printablestring"></serialNumber>
+			</tuStatus>
+			<pearlChain mode="array" type="object" arrayclass="BasicPearlChain"
+				class="FullPosition">
+				<!-- 所有点 Full 选择的值是数组 -->
+				<basicPos type="object" class="BasicPosition">
+					<latitude type="integer"></latitude>
+					<longitude type="integer"></longitude>
+				</basicPos>
+				<extendedPos type="object" class="ExtendedPosition">
+					<altitudeMtr type="integer"></altitudeMtr>
+					<headingDeg type="integer"></headingDeg>
+					<reliability type="object" class="PositionReliability">
+						<fixType mode="2ndValue" type="integer" ndfun="longValue"
+							class="GnssFixType"></fixType>
+						<insideDigitizedArea mode="2ndValue" type="integer"
+							ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+						<fullyDigitizedArea mode="2ndValue" type="integer"
+							ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+						<matchedToDigitalMap mode="2ndValue" type="integer"
+							ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+						<deadReckoning mode="2ndValue" type="integer" ndfun="longValue"
+							class="BOOLEXT"></deadReckoning>
+						<drCalibrated mode="2ndValue" type="integer" ndfun="longValue"
+							class="BOOLEXT"></drCalibrated>
+						<drDistanceMtr type="integer"></drDistanceMtr>
+						<hdopx10 type="integer"></hdopx10>
+						<noOfSatellites type="integer"></noOfSatellites>
+						<differentialGPSAvailable mode="2ndValue"
+							type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+					</reliability>
+					<fixtime type="object" class="TimeStamp">
+						<seconds type="integer"></seconds>
+					</fixtime>
+					<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+				</extendedPos>
+			</pearlChain>
+			<lastGPSTimeStamp type="object" class="TimeStamp">
+				<seconds type="integer"></seconds>
+			</lastGPSTimeStamp>
+			<vin type="object" class="VIN">
+				<isowmi type="printablestring"></isowmi>
+				<isovds type="printablestring"></isovds>
+				<isovisModelyear type="printablestring"></isovisModelyear>
+				<isovisSeqPlant type="printablestring"></isovisSeqPlant>
+			</vin>
+			<navigationInformation type="object"
+				class="NavigationInformation">
+				<destination type="object" class="BasicPosition">
+					<latitude type="integer"></latitude>
+					<longitude type="integer"></longitude>
+				</destination>
+				<arrivalTime type="object" class="TimeHM">
+					<hour type="integer"></hour>
+					<minute type="integer"></minute>
+				</arrivalTime>
+				<distanceToDestMtr type="integer"></distanceToDestMtr>
+				<remainingRange type="integer"></remainingRange>
+			</navigationInformation>
+			<memoryStatus type="object" class="POIMemoryStatus">
+				<maxPoiDataSets type="integer"></maxPoiDataSets>
+				<freePoiDataSets type="integer"></freePoiDataSets>
+			</memoryStatus>
+			<vehiclePropulsionType type="object"
+				class="VehiclePropulsionType">
+				<gasolineTankPresent mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></gasolineTankPresent>
+				<dieselTankPresent mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></dieselTankPresent>
+				<highElectricEnergyPresent mode="2ndValue"
+					type="integer" ndfun="longValue" class="BOOLEXT"></highElectricEnergyPresent>
+				<hydrogenTankPresent mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></hydrogenTankPresent>
+				<naturalGasTankPresent mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></naturalGasTankPresent>
+				<liquidgasTankPresent mode="2ndValue" type="integer"
+					ndfun="longValue" class="BOOLEXT"></liquidgasTankPresent>
+			</vehiclePropulsionType>
+
+			<crashData type="object" class="CrashInformation">
+				<data type="byte"></data>
+				<passengers type="integer"></passengers>
+				<severity type="integer"></severity>
+				<type type="object" class="CrashInformation$Type">
+					<frontCrash mode="2ndValue" type="integer" ndfun="longValue"
+						class="BOOLEXT"></frontCrash>
+					<rearCrash mode="2ndValue" type="integer" ndfun="longValue"
+						class="BOOLEXT"></rearCrash>
+					<sideCrash mode="2ndValue" type="integer" ndfun="longValue"
+						class="BOOLEXT"></sideCrash>
+					<rollover mode="2ndValue" type="integer" ndfun="longValue"
+						class="BOOLEXT"></rollover>
+				</type>
+			</crashData>
+			<remoteOperationResponse type="object"
+				class="RemoteOperationResponseList">
+
+				<!-- <operationScriptVersion type="object" -->
+				<!-- class="MajMinVersion16"> -->
+				<!-- <majorVersion mode="2ndValue" type="integer" fun="getMajorVersion" -->
+				<!-- ndfun="longValue" setfun="setOperationScriptVersion" setmode="2ndValue" 
+					class="ProtocolVersionSingle8"></majorVersion> -->
+				<!-- <minorVersion mode="2ndValue" type="integer" setmode="2ndValue" 
+					fun="getMinorVersion" -->
+				<!-- ndfun="longValue" class="ProtocolVersionSingle8"></minorVersion> -->
+				<!-- </operationScriptVersion> -->
+
+				<operationScriptVersion type="object"
+					fun="getOperationScriptVersion" class="MajMinVersion16">
+					<majorVersion mode="2ndValue" type="integer" fun="getMajorVersion"
+						ndfun="longValue" class="ProtocolVersionSingle8" setmode="2ndValue"></majorVersion>
+					<minorVersion mode="2ndValue" type="integer" fun="getMinorVersion"
+						ndfun="longValue" class="ProtocolVersionSingle8" setmode="2ndValue"></minorVersion>
+					<!-- <majorVersion type="integer" ndfun="longValue" class="ProtocolVersionSingle8" 
+						></majorVersion> <minorVersion type="integer" ndfun="longValue" class="ProtocolVersionSingle8" 
+						></minorVersion> -->
+				</operationScriptVersion>
+
+				<timesExecuted type="integer"></timesExecuted>
+				<lastExecuted type="object" class="TimeStamp">
+					<seconds type="integer"></seconds>
+				</lastExecuted>
+
+				<responses mode="array" type="object" ndfun="getChosenValue"
+					arrayclass="RemoteOperationResponseList$Responses" class="RemoteOperationResponse">
+
+					<operationDesc type="object" class="SimpleRemoteOperation">
+						<component type="printablestring"></component>
+						<operationType mode="2ndValue" type="integer" ndfun="longValue"
+							class="RemoteOperationType"></operationType>
+						<state type="utf8string"></state>
+					</operationDesc>
+
+					<timesExecuted type="integer"></timesExecuted>
+
+					<lastExecuted type="object" class="TimeStamp">
+						<seconds type="integer"></seconds>
+					</lastExecuted>
+					<errorDesc type="printablestring"></errorDesc>
+				</responses>
+
+
+				<!-- <operationScriptVersion type="object" class="SimpleRemoteOperation"> -->
+				<!-- <component type="printablestring"></component> -->
+				<!-- <operationType mode="2ndValue" type="integer" ndfun="longValue" 
+					></operationType> -->
+				<!-- <state type="utf8string"></state> -->
+				<!-- </operationScriptVersion> -->
+
+				<!-- <timesExecuted type="integer"> -->
+				<!-- </timesExecuted> -->
+				<!-- <lastExecuted type="object" class="TimeStamp"> -->
+				<!-- <seconds type="integer"></seconds> -->
+				<!-- </lastExecuted> -->
+
+				<!-- <errorDesc type="printablestring"></errorDesc> -->
+
+			</remoteOperationResponse>
+			<genericText type="object" class="GenericText">
+				<text type="utf8string"></text>
+			</genericText>
+
+			<genericParameters mode="array" type="object"
+				arrayclass="NGTPUplinkCore$GenericParameters" class="GenericParameter">
+				<key mode="choice" ndfun="getChosenFlag" type="object"
+					choiceclass="GenericParameterKey">
+					<name choice="1" type="printablestring" fun="getChosenValue"></name>
+					<id choice="2" type="integer" fun="getChosenValue"></id>
+				</key>
+				<value mode="choice" ndfun="getChosenFlag" type="object"
+					choiceclass="GenericParameterValue">
+					<noval type="null" fun="getChosenValue" choice="1"></noval>
+					<read type="null" fun="getChosenValue" choice="2"></read>
+					<resetToDefault type="null" fun="getChosenValue"
+						choice="3"></resetToDefault>
+					<uint8Val type="integer" fun="getChosenValue" choice="4"></uint8Val>
+					<uint16Val type="integer" fun="getChosenValue" choice="5"></uint16Val>
+					<uint32Val type="integer" fun="getChosenValue" choice="6"></uint32Val>
+					<boolVal type="boolean" fun="getChosenValue" choice="7"></boolVal>
+					<dataVal type="byte" fun="getChosenValue" choice="8"></dataVal>
+					<dataValShort type="byte" fun="getChosenValue" choice="9"></dataValShort>
+					<stringVal type="utf8string" fun="getChosenValue" choice="10"></stringVal>
+					<stringValShort type="utf8string" fun="getChosenValue"
+						choice="11"></stringValShort>
+					<timestamp type="object" fun="getChosenValue" choice="12">
+						<seconds type="integer"></seconds>
+					</timestamp>
+					<poi type="object" fun="getChosenValue" choice="13"
+						class="PointOfInterest">
+						<subject type="utf8string" fun="getSubject"></subject>
+						<category type="utf8string" fun="getCategory"></category>
+						<freetext type="utf8string" fun="getFreetext"></freetext>
+						<name type="object" fun="getName" class="PersonName">
+							<familyName type="utf8string" fun="getFamilyName"></familyName>
+							<firstName type="utf8string" fun="getFirstName"></firstName>
+							<middleName type="utf8string" fun="getMiddleName"></middleName>
+							<prefix type="utf8string" fun="getPrefix"></prefix>
+							<suffix type="utf8string" fun="getSuffix"></suffix>
+						</name>
+						<organization type="utf8string" fun="getOrganization"></organization>
+						<address type="object" fun="getAddress" class="PostalAddress">
+							<street type="utf8string"></street>
+							<houseNumber type="utf8string" fun="getHouseNumber"></houseNumber>
+							<city type="utf8string" fun="getCity"></city>
+							<region type="utf8string" fun="getRegion"></region>
+							<postalCode type="utf8string" fun="getPostalCode"></postalCode>
+							<country type="utf8string" fun="getCountry"></country>
+						</address>
+						<phone1 type="object" fun="getPhone1" class="Phone">
+							<number type="printablestring" fun="getNumber"></number>
+							<type mode="2ndValue" type="integer" ndfun="longValue"
+								class="PhoneType"></type>
+						</phone1>
+						<phone2 type="object" fun="getPhone2" class="Phone">
+							<number type="printablestring" fun="getNumber"></number>
+							<type mode="2ndValue" type="integer" ndfun="longValue"
+								class="PhoneType"></type>
+						</phone2>
+
+						<phone3 type="object" fun="getPhone3" class="Phone">
+
+							<number type="printablestring" fun="getNumber"></number>
+							<type mode="2ndValue" type="integer" ndfun="longValue"
+								class="PhoneType"></type>
+						</phone3>
+
+						<phone4 type="object" fun="getPhone4" class="Phone">
+
+							<number type="printablestring" fun="getNumber"></number>
+							<type mode="2ndValue" type="integer" ndfun="longValue"
+								class="PhoneType"></type>
+						</phone4>
+						<url type="utf8string" fun="getUrl"></url>
+						<email type="utf8string" fun="getEmail"></email>
+						<enhPOIurl type="utf8string" fun="getEnhPOIurl"></enhPOIurl>
+
+						<useAsDestination type="boolean" fun="getUseAsDestination"></useAsDestination>
+						<geoCoordinates type="object" fun="getGeoCoordinates"
+							class="BasicPosition">
+							<latitude type="integer" fun="getLatitude"></latitude>
+							<longitude type="integer" fun="getLongitude"></longitude>
+						</geoCoordinates>
+						<useAsDestination type="boolean"></useAsDestination>
+						<enhPOIurl type="utf8string"></enhPOIurl>
+						<attributes mode="array" type="object"
+							arrayclass="PointOfInterest$Attributes" class="PointOfInterestAttribute">
+							<key type="printablestring"></key>
+							<value type="utf8string">
+							</value>
+						</attributes>
+					</poi>
+					<point type="object" fun="getChosenValue" choice="14"
+						class="BasicPosition">
+						<latitude type="integer"></latitude>
+						<longitude type="integer"></longitude>
+					</point>
+					<position type="object" fun="getChosenValue" choice="15"
+						class="FullPosition">
+						<basicPos type="object" class="BasicPosition">
+							<latitude type="integer"></latitude>
+							<longitude type="integer"></longitude>
+						</basicPos>
+						<extendedPos type="object" class="ExtendedPosition">
+							<altitudeMtr type="integer"></altitudeMtr>
+							<headingDeg type="integer"></headingDeg>
+							<reliability type="object" class="PositionReliability">
+								<fixType mode="2ndValue" type="integer" ndfun="longValue"
+									class="GnssFixType"></fixType>
+								<insideDigitizedArea mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+								<fullyDigitizedArea mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+								<matchedToDigitalMap mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+								<deadReckoning mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></deadReckoning>
+								<drCalibrated mode="2ndValue" type="integer" ndfun="longValue"
+									class="BOOLEXT"></drCalibrated>
+								<drDistanceMtr type="integer"></drDistanceMtr>
+								<hdopx10 type="integer"></hdopx10>
+								<noOfSatellites type="integer"></noOfSatellites>
+								<differentialGPSAvailable mode="2ndValue"
+									type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+							</reliability>
+							<fixtime type="object" class="TimeStamp">
+								<seconds type="integer"></seconds>
+							</fixtime>
+							<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+						</extendedPos>
+					</position>
+					<positions mode="array" type="object" fun="getChosenValue"
+						arrayclass="GenericParameterValue$Positions" class="GenericParameterValue$Positions"
+						choice="16">
+						<!-- 所有点 Full 选择的值是数组 -->
+						<basicPos type="object" class="BasicPosition">
+							<latitude type="integer"></latitude>
+							<longitude type="integer"></longitude>
+						</basicPos>
+						<extendedPos type="object" class="ExtendedPosition">
+							<altitudeMtr type="integer"></altitudeMtr>
+							<headingDeg type="integer"></headingDeg>
+							<reliability type="object" class="PositionReliability">
+								<fixType mode="2ndValue" type="integer" ndfun="longValue"
+									class="GnssFixType"></fixType>
+								<insideDigitizedArea mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+								<fullyDigitizedArea mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+								<matchedToDigitalMap mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+								<deadReckoning mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></deadReckoning>
+								<drCalibrated mode="2ndValue" type="integer" ndfun="longValue"
+									class="BOOLEXT"></drCalibrated>
+								<drDistanceMtr type="integer"></drDistanceMtr>
+								<hdopx10 type="integer"></hdopx10>
+								<noOfSatellites type="integer"></noOfSatellites>
+								<differentialGPSAvailable mode="2ndValue"
+									type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+							</reliability>
+							<fixtime type="object" class="TimeStamp">
+								<seconds type="integer"></seconds>
+							</fixtime>
+							<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+						</extendedPos>
+						<!-- 391 -->
+					</positions>
+					<trackPoint type="object" fun="getChosenValue" choice="17"
+						class="TrackPoint">
+						<!-- 2414 999 -->
+						<trigger type="integer" mode="2ndValue" ndfun="longValue"
+							class="TriggerType"></trigger>
+						<systemTime type="object" class="TimeStamp">
+							<seconds type="integer"></seconds>
+						</systemTime>
+						<collectionId type="integer" mode="2ndValue" ndfun="longValue"
+							setmode="2ndValue" class="CollectionId">
+						</collectionId>
+						<vehicle type="object" class="VehicleTrackPointData">
+							<odometer type="object">
+								<meterResolution type="boolean"></meterResolution>
+								<odometerValueMtr type="integer"></odometerValueMtr>
+							</odometer>
+							<speedKmphx10 type="integer"></speedKmphx10>
+							<vehicleState type="integer" mode="2ndValue" ndfun="longValue"
+								class="VehicleStateType"></vehicleState>
+						</vehicle>
+						<fuel type="object" class="FuelTrackPointData">
+							<consFuelLtrx5000 type="integer"></consFuelLtrx5000>
+							<consElWhx5 type="integer"></consElWhx5>
+							<regElWhx5 type="integer"></regElWhx5>
+						</fuel>
+						<gnss type="object" class="FullPosition">
+							<!-- 所有点 Full 选择的值是数组 -->
+							<basicPos type="object" class="BasicPosition">
+								<latitude type="integer"></latitude>
+								<longitude type="integer"></longitude>
+							</basicPos>
+							<extendedPos type="object" class="ExtendedPosition">
+								<altitudeMtr type="integer"></altitudeMtr>
+								<headingDeg type="integer"></headingDeg>
+								<reliability type="object" class="PositionReliability">
+									<fixType mode="2ndValue" type="integer" ndfun="longValue"
+										class="GnssFixType"></fixType>
+									<insideDigitizedArea mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+									<fullyDigitizedArea mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+									<matchedToDigitalMap mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+									<deadReckoning mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></deadReckoning>
+									<drCalibrated mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></drCalibrated>
+									<drDistanceMtr type="integer"></drDistanceMtr>
+									<hdopx10 type="integer"></hdopx10>
+									<noOfSatellites type="integer"></noOfSatellites>
+									<differentialGPSAvailable mode="2ndValue"
+										type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+								</reliability>
+								<fixtime type="object" class="TimeStamp">
+									<seconds type="integer"></seconds>
+								</fixtime>
+								<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+							</extendedPos>
+						</gnss>
+						<gsm type="object" class="NetworkInformation">
+							<status mode="2ndValue" type="integer" ndfun="longValue"
+								class="NetworkRegistrationStatus"></status>
+							<location mode="choice" type="object" ndfun="getChosenFlag"
+								choiceclass="NetworkLocation">
+								<gsmNwLocation type="object" fun="getChosenValue"
+									choice="1" class="GsmNetworkLocation">
+									<mcc type="integer"></mcc>
+									<mnc type="integer"></mnc>
+									<lac type="integer"></lac>
+									<ci type="integer"></ci>
+									<bsic type="integer"></bsic>
+								</gsmNwLocation>
+								<umtsNwLocation type="object" fun="getChosenValue"
+									choice="2" class="UmtsNetworkLocation">
+									<mcc type="integer"></mcc>
+									<mnc type="integer"></mnc>
+									<lac type="integer"></lac>
+									<ci type="integer"></ci>
+
+								</umtsNwLocation>
+								<lteNwLocation type="object" fun="getChosenValue"
+									choice="3" class="LteNetworkLocation">
+									<mcc type="integer"></mcc>
+									<mnc type="integer"></mnc>
+									<eNB type="integer"></eNB>
+									<pci type="integer"></pci>
+								</lteNwLocation>
+							</location>
+							<rxLevelPerc type="integer"></rxLevelPerc>
+						</gsm>
+						<security type="object" class="SecurityTrackPointData">
+							<tuPowerSrc mode="2ndValue" type="integer" ndfun="longValue"
+								class="TUPowerSource"></tuPowerSrc>
+							<backupBattery mode="2ndValue" type="integer"
+								ndfun="longValue" class="TUBackupBatteryStatus"></backupBattery>
+							<mainBattery mode="2ndValue" type="integer" ndfun="longValue"
+								class="MainBatteryStatus"></mainBattery>
+							<engineBlock mode="2ndValue" type="integer" ndfun="longValue"
+								class="EngineBlockedStatus"></engineBlock>
+							<brazilEventMode mode="2ndValue" type="integer"
+								ndfun="longValue" class="BOOLEXT"></brazilEventMode>
+							<timeToNextTpSec type="integer"></timeToNextTpSec>
+						</security>
+						<ext mode="choice" type="object" ndfun="getChosenFlag"
+							choiceclass="TrackPointExtension">
+							<none type="null" fun="getChosenValue" choice="1"></none>
+							<ecoRating type="integer" fun="getChosenValue" choice="2"></ecoRating>
+						</ext>
+					</trackPoint>
+					<setOk type="null" fun="getChosenValue" choice="18" class=""></setOk>
+					<failedNotAllowed type="null" fun="getChosenValue"
+						choice="19"></failedNotAllowed>
+					<setFailedWrongType type="null" fun="getChosenValue"
+						choice="20"></setFailedWrongType>
+					<setFailedValueOutOfRange type="null"
+						fun="getChosenValue" choice="21"></setFailedValueOutOfRange>
+					<failedKeyNotSupported type="null" fun="getChosenValue"
+						choice="22"></failedKeyNotSupported>
+				</value>
+
+			</genericParameters>
+
+			<trigger mode="array" type="2ndValue" ndfun="longValue"
+				class="TriggerType" arrayclass="NGTPUplinkCore$Trigger"></trigger>
+
+			<alerts mode="array" type="object" class="AlertType"
+				arrayclass="NGTPUplinkCore$Alerts">
+				<time type="object" class="TimeStamp">
+					<seconds type="integer"></seconds>
+				</time>
+				<alertData mode="choice" type="object" ndfun="getChosenFlag"
+					choiceclass="AlertData">
+					<engineOn type="null" fun="getChosenValue" choice="1"></engineOn>
+					<vehicleAlarm type="null" fun="getChosenValue" choice="2"></vehicleAlarm>
+					<externalPowerRemoval type="null" fun="getChosenValue"
+						choice="3"></externalPowerRemoval>
+					<gsmJamming type="null" fun="getChosenValue" choice="4"></gsmJamming>
+					<gsmAntennaFailure type="null" fun="getChosenValue"
+						choice="5"></gsmAntennaFailure>
+					<gnssAntennaFailure type="null" fun="getChosenValue"
+						choice="6"></gnssAntennaFailure>
+					<unauthMovement type="null" fun="getChosenValue"
+						choice="7"></unauthMovement>
+					<coolantLevel type="null" fun="getChosenValue" choice="8"></coolantLevel>
+					<unused type="null" fun="getChosenValue" choice="9"></unused>
+					<washerFluidLevel type="null" fun="getChosenValue"
+						choice="10"></washerFluidLevel>
+					<brakeFluidStatus type="null" fun="getChosenValue"
+						choice="11"></brakeFluidStatus>
+					<brakePadWear type="null" fun="getChosenValue" choice="12"></brakePadWear>
+					<tyrePressureFL type="object" fun="getChosenValue"
+						choice="13" class="TyreStatus">
+						<warning mode="2ndValue" type="integer" ndfun="longValue"
+							class="TyrePressureWarning"></warning>
+						<pressureHpa type="integer"></pressureHpa>
+					</tyrePressureFL>
+					<tyrePressureFR type="object" fun="getChosenValue"
+						choice="14" lass="TyreStatus">
+						<warning mode="2ndValue" type="integer" ndfun="longValue"
+							class="TyrePressureWarning"></warning>
+						<pressureHpa type="integer"></pressureHpa>
+					</tyrePressureFR>
+					<tyrePressureRL type="object" fun="getChosenValue"
+						choice="15" lass="TyreStatus">
+						<warning mode="2ndValue" type="integer" ndfun="longValue"
+							class="TyrePressureWarning"></warning>
+						<pressureHpa type="integer"></pressureHpa>
+					</tyrePressureRL>
+					<tyrePressureRR type="object" fun="getChosenValue"
+						choice="16" lass="TyreStatus">
+						<warning mode="2ndValue" type="integer" ndfun="longValue"
+							class="TyrePressureWarning"></warning>
+						<pressureHpa type="integer"></pressureHpa>
+					</tyrePressureRR>
+					<tyrePressSensorFail type="null" fun="getChosenValue"
+						choice="17"></tyrePressSensorFail>
+					<engineMalfunction type="null" fun="getChosenValue"
+						choice="18"></engineMalfunction>
+					<oilLevel type="inetger" mode="2ndValue" fun="getChosenValue"
+						choice="19" class="LiquidLevelWarning"></oilLevel>
+					<distToServiceKm type="null" fun="getChosenValue"
+						choice="20"></distToServiceKm>
+					<odometerExceeded type="object" fun="getChosenValue"
+						choice="21" class="OdometerData">
+						<meterResolution type="boolean"></meterResolution>
+						<odometerValueMtr type="integer"></odometerValueMtr>
+					</odometerExceeded>
+					<transportMode type="null" fun="getChosenValue"
+						choice="22"></transportMode>
+					<lowBatteryVoltx10 type="integer" fun="getChosenValue"
+						choice="23"></lowBatteryVoltx10>
+					<fuelLevel type="null" fun="getChosenValue" choice="24"></fuelLevel>
+					<fuelLevelLtrs type="integer" fun="getChosenValue"
+						choice="25"></fuelLevelLtrs>
+					<remoteClimate type="null" fun="getChosenValue"
+						choice="26"></remoteClimate>
+					<vehicleUnlocked type="null" fun="getChosenValue"
+						choice="27"></vehicleUnlocked>
+					<doorOpen type="null" fun="getChosenValue" choice="28"></doorOpen>
+					<bootOpen type="null" fun="getChosenValue" choice="29"></bootOpen>
+					<bonnetOpen type="null" fun="getChosenValue" choice="30"></bonnetOpen>
+					<roofOpen type="null" fun="getChosenValue" choice="31"></roofOpen>
+					<windowOpen type="null" fun="getChosenValue" choice="32"></windowOpen>
+					<alarmUnarmed type="null" fun="getChosenValue" choice="33"></alarmUnarmed>
+				</alertData>
+				<alertActive type="boolean"></alertActive>
+			</alerts>
+			<trackpoints mode="array" type="object"
+				arrayclass="NGTPUplinkCore$Trackpoints" class="TrackPoint">
+				<!-- 2414 999 -->
+				<systemTime type="object" class="TimeStamp">
+					<seconds type="integer"></seconds>
+				</systemTime>
+				<trigger type="integer" mode="2ndValue" ndfun="longValue"
+					class="TriggerType"></trigger>
+				<collectionId type="integer" mode="2ndValue" ndfun="longValue"
+					setmode="2ndValue" class="CollectionId">
+				</collectionId>
+				<vehicle type="object" class="VehicleTrackPointData">
+					<odometer type="object" class="OdometerData">
+						<meterResolution type="boolean"></meterResolution>
+						<odometerValueMtr type="integer"></odometerValueMtr>
+					</odometer>
+					<speedKmphx10 type="integer"></speedKmphx10>
+					<vehicleState type="integer" mode="2ndValue" ndfun="longValue"
+						class="VehicleStateType"></vehicleState>
+				</vehicle>
+				<fuel type="object" class="FuelTrackPointData">
+					<consFuelLtrx5000 type="integer"></consFuelLtrx5000>
+					<consElWhx5 type="integer"></consElWhx5>
+					<regElWhx5 type="integer"></regElWhx5>
+				</fuel>
+				<gnss type="object" class="FullPosition">
+					<!-- 所有点 Full 选择的值是数组 -->
+					<basicPos type="object" class="BasicPosition">
+						<latitude type="integer"></latitude>
+						<longitude type="integer"></longitude>
+					</basicPos>
+					<extendedPos type="object" class="ExtendedPosition">
+						<altitudeMtr type="integer"></altitudeMtr>
+						<headingDeg type="integer"></headingDeg>
+						<reliability type="object" class="PositionReliability">
+							<fixType mode="2ndValue" type="integer" ndfun="longValue"
+								class="GnssFixType"></fixType>
+							<insideDigitizedArea mode="2ndValue" type="integer"
+								ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+							<fullyDigitizedArea mode="2ndValue" type="integer"
+								ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+							<matchedToDigitalMap mode="2ndValue" type="integer"
+								ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+							<deadReckoning mode="2ndValue" type="integer"
+								ndfun="longValue" class="BOOLEXT"></deadReckoning>
+							<drCalibrated mode="2ndValue" type="integer" ndfun="longValue"
+								class="BOOLEXT"></drCalibrated>
+							<drDistanceMtr type="integer"></drDistanceMtr>
+							<hdopx10 type="integer"></hdopx10>
+							<noOfSatellites type="integer"></noOfSatellites>
+							<differentialGPSAvailable mode="2ndValue"
+								type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+						</reliability>
+						<fixtime type="object" class="TimeStamp">
+							<seconds type="integer"></seconds>
+						</fixtime>
+						<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+					</extendedPos>
+				</gnss>
+				<gsm type="object" class="NetworkInformation">
+					<status mode="2ndValue" type="integer" ndfun="longValue"
+						class="NetworkRegistrationStatus"></status>
+					<location mode="choice" ndfun="getChosenFlag" type="object"
+						choiceclass="NetworkLocation">
+						<gsmNwLocation type="object" fun="getChosenValue"
+							choice="1" class="GsmNetworkLocation">
+							<mcc type="integer"></mcc>
+							<mnc type="integer"></mnc>
+							<lac type="integer"></lac>
+							<ci type="integer"></ci>
+							<bsic type="integer"></bsic>
+						</gsmNwLocation>
+						<umtsNwLocation type="object" fun="getChosenValue"
+							choice="2" class="UmtsNetworkLocation">
+							<mcc type="integer"></mcc>
+							<mnc type="integer"></mnc>
+							<lac type="integer"></lac>
+							<ci type="integer"></ci>
+
+						</umtsNwLocation>
+						<lteNwLocation type="object" fun="getChosenValue"
+							choice="3" class="LteNetworkLocation">
+							<mcc type="integer"></mcc>
+							<mnc type="integer"></mnc>
+							<eNB type="integer"></eNB>
+							<pci type="integer"></pci>
+						</lteNwLocation>
+					</location>
+					<rxLevelPerc type="integer"></rxLevelPerc>
+				</gsm>
+				<security type="object" class="SecurityTrackPointData">
+					<tuPowerSrc mode="2ndValue" type="integer" ndfun="longValue"
+						class="TUPowerSource"></tuPowerSrc>
+					<backupBattery type="object" class="TUBackupBatteryStatus">
+						<primaryVoltx10 type="integer"></primaryVoltx10>
+						<primaryChargePerc type="integer"></primaryChargePerc>
+						<secondaryVoltx10 type="integer"></secondaryVoltx10>
+						<secondaryChargePerc type="integer"></secondaryChargePerc>
+					</backupBattery>
+					<mainBattery mode="2ndValue" type="integer" ndfun="longValue"
+						class="MainBatteryStatus"></mainBattery>
+					<engineBlock mode="2ndValue" type="integer" ndfun="longValue"
+						class="EngineBlockedStatus"></engineBlock>
+					<brazilEventMode mode="2ndValue" type="integer"
+						ndfun="longValue" class="BOOLEXT"></brazilEventMode>
+					<timeToNextTpSec type="integer"></timeToNextTpSec>
+				</security>
+
+				<ext mode="choice" type="object" ndfun="getChosenFlag"
+					choiceclass="TrackPointExtension">
+					<none type="null" fun="getChosenValue" choice="1"></none>
+					<ecoRating type="integer" fun="getChosenValue" choice="2"></ecoRating>
+				</ext>
+			</trackpoints>
+			<journeys mode="array" type="arraychoice" ndfun="getChosenFlag"
+				arrayclass="NGTPUplinkCore$Journeys" choiceclass="JourneySummary"
+				class="JourneySummary">
+				<type1 fun="getChosenValue" type="object" choice="1"
+					class="JourneySummary1">
+					<journeyId mode="2ndValue" type="integer" ndfun="longValue"
+						class="CollectionId" setmode="2ndValue"></journeyId>
+					<startTrigger mode="2ndValue" type="integer" ndfun="longValue"
+						class="TriggerType"></startTrigger>
+					<startTime type="object" class="TimeStamp">
+						<seconds type="integer"></seconds>
+					</startTime>
+					<startOdometer type="object" class="OdometerData">
+						<meterResolution type="boolean"></meterResolution>
+						<odometerValueMtr type="integer"></odometerValueMtr>
+					</startOdometer>
+					<firstPosition type="object" class="BasicPosition">
+						<latitude type="integer"></latitude>
+						<longitude type="integer"></longitude>
+					</firstPosition>
+					<firstPosDist type="integer"></firstPosDist>
+					<endTrigger mode="2ndValue" type="integer" ndfun="longValue"
+						class="TriggerType"></endTrigger>
+					<endTime type="object" class="TimeStamp">
+						<seconds type="integer"></seconds>
+					</endTime>
+					<endOdometer type="object" class="OdometerData">
+						<meterResolution type="boolean"></meterResolution>
+						<odometerValueMtr type="integer"></odometerValueMtr>
+					</endOdometer>
+					<endPosition type="object" class="BasicPosition">
+						<latitude type="integer"></latitude>
+						<longitude type="integer"></longitude>
+					</endPosition>
+					<avgFuelConsCl type="integer" class="AvgFuelConsumptionCl"></avgFuelConsCl>
+					<userNote type="byte"></userNote>
+					<tripType mode="2ndValue" type="integer" ndfun="longValue"
+						class="TripType"></tripType>
+				</type1>
+				<type2 fun="getChosenValue" type="object" choice="2">
+					<journeyId mode="2ndValue" type="integer" ndfun="longValue"
+						class="CollectionId" setmode="2ndValue"></journeyId>
+					<dashboardUnits mode="2ndValue" type="integer"
+						ndfun="longValue" class="CollectionId"></dashboardUnits>
+					<avgFuelConsx10 type="integer"></avgFuelConsx10>
+					<distancex10 type="integer"></distancex10>
+					<avgSpd type="integer"></avgSpd>
+					<ecoStopTimer type="integer"></ecoStopTimer>
+					<engineOffPerc type="integer"></engineOffPerc>
+					<electricAssistPerc type="integer"></electricAssistPerc>
+					<energyRecoveredx10 type="integer"></energyRecoveredx10>
+					<throttleEcoScorex10 type="integer"></throttleEcoScorex10>
+					<speedEcoScorex10 type="integer"></speedEcoScorex10>
+					<brakeEcoScorex10 type="integer"></brakeEcoScorex10>
+					<totalEcoScorex10 type="integer"></totalEcoScorex10>
+					<startTime type="object" class="TimeStamp">
+						<seconds type="integer"></seconds>
+					</startTime>
+				</type2>
+				<type2A fun="getChosenValue" type="object" choice="3">
+					<journeyId mode="2ndValue" type="integer" ndfun="longValue"
+						class="CollectionId" setmode="2ndValue"></journeyId>
+					<dashboardUnits mode="2ndValue" type="integer"
+						ndfun="longValue" class="CollectionId"></dashboardUnits>
+					<avgFuelConsx10 type="integer"></avgFuelConsx10>
+					<distancex10 type="integer"></distancex10>
+					<avgSpd type="integer"></avgSpd>
+					<ecoStopTimer type="integer"></ecoStopTimer>
+					<engineOffPerc type="integer"></engineOffPerc>
+					<electricAssistPerc type="integer"></electricAssistPerc>
+					<energyRecoveredx10 type="integer"></energyRecoveredx10>
+					<throttleEcoScorex10 type="integer"></throttleEcoScorex10>
+					<speedEcoScorex10 type="integer"></speedEcoScorex10>
+					<brakeEcoScorex10 type="integer"></brakeEcoScorex10>
+					<totalEcoScorex10 type="integer"></totalEcoScorex10>
+					<startTime type="object" class="TimeStamp">
+						<seconds type="integer"></seconds>
+					</startTime>
+				</type2A>
+				<type2B fun="getChosenValue" type="object" choice="4">
+					<journeyId mode="2ndValue" type="integer" ndfun="longValue"
+						class="CollectionId" setmode="2ndValue"></journeyId>
+					<dashboardUnits mode="2ndValue" type="integer"
+						ndfun="longValue" class="CollectionId"></dashboardUnits>
+					<avgFuelConsx10 type="integer"></avgFuelConsx10>
+					<distancex10 type="integer"></distancex10>
+					<avgSpd type="integer"></avgSpd>
+					<ecoStopTimer type="integer"></ecoStopTimer>
+					<engineOffPerc type="integer"></engineOffPerc>
+					<electricAssistPerc type="integer"></electricAssistPerc>
+					<energyRecoveredx10 type="integer"></energyRecoveredx10>
+					<throttleEcoScorex10 type="integer"></throttleEcoScorex10>
+					<speedEcoScorex10 type="integer"></speedEcoScorex10>
+					<brakeEcoScorex10 type="integer"></brakeEcoScorex10>
+					<totalEcoScorex10 type="integer"></totalEcoScorex10>
+					<startTime type="object" class="TimeStamp">
+						<seconds type="integer"></seconds>
+					</startTime>
+				</type2B>
+
+			</journeys>
+			<msdInfo type="object" class="MSDInformation">
+				<messageIdentifier type="integer"></messageIdentifier>
+			</msdInfo>
+			<debugInfo mode="array" type="object" arrayclass="NGTPUplinkCore$DebugInfo" class="DebugInfo">
+				<id type="utf8string"></id>
+				<value type="integer"></value>
+			</debugInfo>
+			<errorCodes mode="array" type="arraychoice" ndfun="getChosenFlag"
+				arrayclass="NGTPUplinkCore$ErrorCodes" choiceclass="ErrorCode"
+				class="ErrorCode">
+				<incorrectSequence type="null" fun="getChosenValue"
+					choice="1"></incorrectSequence>
+				<incorrectEct type="null" fun="getChosenValue" choice="2"></incorrectEct>
+				<incorrectState type="null" fun="getChosenValue"
+					choice="3"></incorrectState>
+				<notAllowed type="null" fun="getChosenValue" choice="4"></notAllowed>
+				<invalidData type="null" fun="getChosenValue" choice="5"></invalidData>
+				<invalidFormat type="null" fun="getChosenValue"
+					choice="6"></invalidFormat>
+				<outOfMemory type="integer" fun="getChosenValue" choice="7"></outOfMemory>
+				<noOngoingService type="null" fun="getChosenValue"
+					choice="8"></noOngoingService>
+				<vehiclePowerModeNotCorrect type="null"
+					fun="getChosenValue" choice="9"></vehiclePowerModeNotCorrect>
+				<conditionsNotCorrect type="null" fun="getChosenValue"
+					choice="10"></conditionsNotCorrect>
+				<executionFailure type="null" fun="getChosenValue"
+					choice="11"></executionFailure>
+				<fuelLevelTooLow type="null" fun="getChosenValue"
+					choice="12"></fuelLevelTooLow>
+				<batteryLevelTooLow type="null" fun="getChosenValue"
+					choice="13"></batteryLevelTooLow>
+				<runTimeExpiry type="null" fun="getChosenValue"
+					choice="14"></runTimeExpiry>
+				<theftEvent type="null" fun="getChosenValue" choice="15"></theftEvent>
+				<crashEvent type="null" fun="getChosenValue" choice="16"></crashEvent>
+				<timeout type="null" fun="getChosenValue" choice="17"></timeout>
+				<windowNotClosed type="null" fun="getChosenValue"
+					choice="18"></windowNotClosed>
+				<hazardWarningOn type="null" fun="getChosenValue"
+					choice="19"></hazardWarningOn>
+				<vehicleNotLocked type="null" fun="getChosenValue"
+					choice="20"></vehicleNotLocked>
+				<alarmActive type="null" fun="getChosenValue" choice="21"></alarmActive>
+				<brakePedalPressed type="null" fun="getChosenValue"
+					choice="22"></brakePedalPressed>
+				<vehicleNotStationary type="null" fun="getChosenValue"
+					choice="23"></vehicleNotStationary>
+				<transmissionNotInPark type="null" fun="getChosenValue"
+					choice="24"></transmissionNotInPark>
+				<climateModeNotCorrect type="null" fun="getChosenValue"
+					choice="25"></climateModeNotCorrect>
+				<genericError  type="printablestring"
+					fun="getChosenValue" choice="26"></genericError>
+
+
+			</errorCodes>
+
+
+
+		</uplink>
+		<downlink type="object" fun="getChosenValue" choice="2"
+			class="NGTPDownlinkCore">
+
+			<remoteOperations type="object" fun="getRemoteOperations"
+				class="RemoteOperationRequestList">
+				<operationScriptVersion type="object"
+					fun="getOperationScriptVersion" class="MajMinVersion16">
+					<majorVersion mode="2ndValue" type="integer" fun="getMajorVersion"
+						ndfun="longValue" class="ProtocolVersionSingle8" setmode="2ndValue"></majorVersion>
+					<minorVersion mode="2ndValue" type="integer" fun="getMinorVersion"
+						ndfun="longValue" class="ProtocolVersionSingle8" setmode="2ndValue"></minorVersion>
+					<!-- <majorVersion type="integer" ndfun="longValue" class="ProtocolVersionSingle8" 
+						></majorVersion> <minorVersion type="integer" ndfun="longValue" class="ProtocolVersionSingle8" 
+						></minorVersion> -->
+				</operationScriptVersion>
+				<executionTrigger type="object" fun="getExecutionTrigger"
+					mode="choice" ndfun="getChosenFlag" choiceclass="RemoteOperationTrigger">
+
+					<now type="null" fun="getChosenValue" choice="1"></now>
+					<at_convenience type="null" fun="getChosenValue"
+						choice="2"></at_convenience>
+					<periodic type="object" fun="getChosenValue" choice="3">
+						<periodSec type="integer"></periodSec>
+						<startAt type="object">
+							<seconds type="integer"></seconds>
+						</startAt>
+
+					</periodic>
+					<no_later_than type="object" fun="getChosenValue"
+						choice="4">
+						<seconds type="integer"></seconds>
+					</no_later_than>
+					<generic mode="subchoice" type="byte" fun="getChosenValue"
+						ndfun="byteArrayValue" choice="5"></generic>
+					<distanceMtrx100 type="integer" fun="getChosenValue"
+						choice="6"></distanceMtrx100>
+					<movementKmph type="integer" fun="getChosenValue"
+						mode="subchoice" ndfun="longValue" choice="7"></movementKmph>
+					<noMovementSec type="integer" fun="getChosenValue"
+						mode="subchoice" ndfun="longValue" choice="8"></noMovementSec>
+					<engineOn type="null" fun="getChosenValue" choice="9"></engineOn>
+					<engineOff type="null" fun="getChosenValue" choice="10"></engineOff>
+					<ignitionOn type="null" fun="getChosenValue" choice="11"></ignitionOn>
+					<ignitionOff type="null" fun="getChosenValue" choice="12"></ignitionOff>
+					<doorStatusChange mode="subchoice" type="integer"
+						choice="13" fun="getChosenValue" ndfun="longValue"></doorStatusChange>
+					<vehicleTechnicalWarning type="null"
+						fun="getChosenValue" choice="14"></vehicleTechnicalWarning>
+					<vehicleError type="null" fun="getChosenValue" choice="15"></vehicleError>
+					<fuelLevelChangedAbovePerc type="integer"
+						fun="getChosenValue" mode="subchoice" ndfun="longValue" choice="16"></fuelLevelChangedAbovePerc>
+					<fuelLevelChangedBelowPerc type="integer"
+						fun="getChosenValue" mode="subchoice" ndfun="longValue" choice="17"></fuelLevelChangedBelowPerc>
+					<internalTemperatureAboveDeg type="integer"
+						fun="getChosenValue" mode="subchoice" ndfun="longValue" choice="18"></internalTemperatureAboveDeg>
+					<internalTemperatureBelowDeg type="integer"
+						fun="getChosenValue" mode="subchoice" ndfun="longValue" choice="19"></internalTemperatureBelowDeg>
+					<externalTemperatureAboveDeg type="integer"
+						fun="getChosenValue" mode="subchoice" ndfun="longValue" choice="20"></externalTemperatureAboveDeg>
+					<externalTemperatureBelowDeg type="integer"
+						fun="getChosenValue" mode="subchoice" ndfun="longValue" choice="21"></externalTemperatureBelowDeg>
+				</executionTrigger>
+
+				<name type="integer" mode="2ndValue" ndfun="longValue"
+					class="RemoteOperationName"></name>
+				<periodSecx10 type="integer"></periodSecx10>
+				<occurs type="integer"></occurs>
+
+				<remoteOperations mode="array" type="object"
+					fun="getRemoteOperations" arrayclass="RemoteOperationRequestList$RemoteOperations"
+					class="RemoteOperationRequest">
+					<operationDesc type="object" class="SimpleRemoteOperation">
+						<component type="printablestring"></component>
+						<operationType mode="2ndValue" type="integer" ndfun="longValue"
+							class="RemoteOperationType"></operationType>
+						<state type="integer"></state>
+					</operationDesc>
+					<stopIfFail type="boolean"></stopIfFail>
+					<waitForPreviousCommand type="boolean"></waitForPreviousCommand>
+					<operationTimeoutSec type="integer"></operationTimeoutSec>
+					<periodSecx10 type="integer"></periodSecx10>
+					<occurs type="integer"></occurs>
+					<initialWaitTimeSecx10 type="integer"></initialWaitTimeSecx10>
+					<requiredVehicleStates mode="2ndValue" type="integer"
+						ndfun="longValue" class="VehicleStateType"></requiredVehicleStates>
+				</remoteOperations>
+			</remoteOperations>
+
+
+			<genericText type="object" fun="getGenericText" class="GenericText">
+				<text type="utf8string" fun="getText"></text>
+			</genericText>
+
+			<configuration type="object" class="TuConfiguration">
+				<configVersion type="integer" mode="2ndValue" ndfun="longValue"
+					class="TuConfigVersion" setmode="2ndValue"></configVersion>
+				<countries mode="array" type="object" arrayclass="TuConfiguration$Countries"
+					class="CountryConfigurationBlock">
+					<applications mode="2ndArray" type="2ndArray" ndfun="longValue"
+						arrayclass="CountryConfigurationBlock$Applications">
+					</applications>
+					<validCountryCode type="integer"></validCountryCode>
+					<applicationConfig type="object"
+						class="ApplicationConfiguration">
+						<eCall_requestCscNumber type="boolean"></eCall_requestCscNumber>
+						<eCall_psapType mode="2ndValue" type="integer"
+							ndfun="longValue" class="ApplicationConfiguration$ECall_psapType"></eCall_psapType>
+					</applicationConfig>
+					<addresses mode="array" type="object"
+						arrayclass="CountryConfigurationBlock$Addresses" class="AddressBlock">
+						<addressId type="integer"></addressId>
+						<address mode="choice" ndfun="getChosenFlag" choiceclass="AddressType">
+							<absolute type="object" fun="getChosenValue" choice="1"
+								class="CommunicationAddress">
+								<networkID mode="2ndValue" type="integer" ndfun="longValue"
+									class="NetworkType"></networkID>
+								<validityRange mode="2ndValue" type="integer"
+									ndfun="longValue" class="CommunicationAddress$ValidityRange"></validityRange>
+								<address type="object" mode="choice" ndfun="getChosenFlag"
+									choiceclass="Address">
+									<address_bcd type="integer" mode="array" choice="1"></address_bcd>
+									<address_ascii type="byte" fun="getChosenValue"
+										choice="2"></address_ascii>
+								</address>
+							</absolute>
+							<reference_id type="null" fun="getChosenValue"
+								choice="2" class="Null"></reference_id>
+						</address>
+						<addressUsage type="integer" mode="2ndValue" ndfun="longValue"
+							class="AddressBlock$AddressUsage"></addressUsage>
+					</addresses>
+					<activated type="boolean"></activated>
+
+				</countries>
+			</configuration>
+
+			<poiDataSet mode="array" type="object"
+				arrayclass="NGTPDownlinkCore$PoiDataSet" class="PointOfInterest">
+
+				<subject type="utf8string" fun="getSubject"></subject>
+				<category type="utf8string" fun="getCategory"></category>
+				<freetext type="utf8string" fun="getFreetext"></freetext>
+				<name type="object" fun="getName" class="PersonName">
+					<familyName type="utf8string" fun="getFamilyName"></familyName>
+					<firstName type="utf8string" fun="getFirstName"></firstName>
+					<middleName type="utf8string" fun="getMiddleName"></middleName>
+					<prefix type="utf8string" fun="getPrefix"></prefix>
+					<suffix type="utf8string" fun="getSuffix"></suffix>
+				</name>
+				<organization type="utf8string" fun="getOrganization"></organization>
+				<address type="object" fun="getAddress" class="PostalAddress">
+					<street type="utf8string"></street>
+					<houseNumber type="utf8string" fun="getHouseNumber"></houseNumber>
+					<city type="utf8string" fun="getCity"></city>
+					<region type="utf8string" fun="getRegion"></region>
+					<postalCode type="utf8string" fun="getPostalCode"></postalCode>
+					<country type="utf8string" fun="getCountry"></country>
+				</address>
+				<phone1 type="object" fun="getPhone1" class="Phone">
+					<number type="printablestring" fun="getNumber"></number>
+					<type mode="2ndValue" type="integer" ndfun="longValue" class="PhoneType"></type>
+				</phone1>
+				<phone2 type="object" fun="getPhone2" class="Phone">
+					<number type="printablestring" fun="getNumber"></number>
+					<type mode="2ndValue" type="integer" ndfun="longValue" class="PhoneType"></type>
+				</phone2>
+
+				<phone3 type="object" fun="getPhone3" class="Phone">
+
+					<number type="printablestring" fun="getNumber"></number>
+					<type mode="2ndValue" type="integer" ndfun="longValue" class="PhoneType"></type>
+				</phone3>
+
+				<phone4 type="object" fun="getPhone4" class="Phone">
+
+					<number type="printablestring" fun="getNumber"></number>
+					<type mode="2ndValue" type="integer" ndfun="longValue" class="PhoneType"></type>
+				</phone4>
+				<url type="utf8string" fun="getUrl"></url>
+				<email type="utf8string" fun="getEmail"></email>
+				<enhPOIurl type="utf8string" fun="getEnhPOIurl"></enhPOIurl>
+
+				<useAsDestination type="boolean" fun="getUseAsDestination"></useAsDestination>
+				<geoCoordinates type="object" fun="getGeoCoordinates"
+					class="BasicPosition">
+					<latitude type="integer"></latitude>
+					<longitude type="integer"></longitude>
+				</geoCoordinates>
+				<useAsDestination type="boolean"></useAsDestination>
+				<enhPOIurl type="utf8string"></enhPOIurl>
+				<attributes mode="array" type="object"
+					arrayclass="PointOfInterest$Attributes" class="PointOfInterestAttribute">
+					<key type="printablestring"></key>
+					<value type="utf8string"></value>
+				</attributes>
+			</poiDataSet>
+
+			<genericParams mode="array" type="object"
+				arrayclass="NGTPDownlinkCore$GenericParams" class="GenericParameter">
+
+				<key mode="choice" type="object" ndfun="getChosenFlag"
+					choiceclass="GenericParameterKey">
+					<name choice="1" mode="subchoice" type="printablestring" fun="getChosenValue"
+						ndfun="longValue"></name>
+					<id choice="2" mode="subchoice" type="integer" fun="getChosenValue"
+						ndfun="longValue"></id>
+				</key>
+
+				<value mode="choice" ndfun="getChosenFlag" type="object"
+					choiceclass="GenericParameterValue">
+					<noval type="null" fun="getChosenValue" choice="1"></noval>
+					<read type="null" fun="getChosenValue" choice="2"></read>
+					<resetToDefault type="null" fun="getChosenValue"
+						choice="3"></resetToDefault>
+					<uint8Val type="integer" fun="getChosenValue" choice="4"></uint8Val>
+					<uint16Val type="integer" fun="getChosenValue" choice="5"></uint16Val>
+					<uint32Val type="integer" fun="getChosenValue" choice="6"></uint32Val>
+					<boolVal type="boolean" fun="getChosenValue" choice="7"></boolVal>
+					<dataVal type="byte" fun="getChosenValue" choice="8"></dataVal>
+					<dataValShort type="byte" fun="getChosenValue" choice="9"></dataValShort>
+					<stringVal type="utf8string" fun="getChosenValue" choice="10"></stringVal>
+					<stringValShort type="utf8string" fun="getChosenValue"
+						choice="11"></stringValShort>
+					<timestamp type="object" fun="getChosenValue" choice="12">
+						<seconds type="integer"></seconds>
+					</timestamp>
+					<poi type="object" fun="getChosenValue" choice="13"
+						class="PointOfInterest">
+						<subject type="utf8string" fun="getSubject"></subject>
+						<category type="utf8string" fun="getCategory"></category>
+						<freetext type="utf8string" fun="getFreetext"></freetext>
+						<name type="object" fun="getName" class="PersonName">
+							<familyName type="utf8string" fun="getFamilyName"></familyName>
+							<firstName type="utf8string" fun="getFirstName"></firstName>
+							<middleName type="utf8string" fun="getMiddleName"></middleName>
+							<prefix type="utf8string" fun="getPrefix"></prefix>
+							<suffix type="utf8string" fun="getSuffix"></suffix>
+						</name>
+						<organization type="utf8string" fun="getOrganization"></organization>
+						<address type="object" fun="getAddress" class="PostalAddress">
+							<street type="utf8string"></street>
+							<houseNumber type="utf8string" fun="getHouseNumber"></houseNumber>
+							<city type="utf8string" fun="getCity"></city>
+							<region type="utf8string" fun="getRegion"></region>
+							<postalCode type="utf8string" fun="getPostalCode"></postalCode>
+							<country type="utf8string" fun="getCountry"></country>
+						</address>
+						<phone1 type="object" fun="getPhone1" class="Phone">
+							<number type="printablestring" fun="getNumber"></number>
+							<type mode="2ndValue" type="integer" ndfun="longValue"
+								class="PhoneType"></type>
+						</phone1>
+						<phone2 type="object" fun="getPhone2" class="Phone">
+							<number type="printablestring" fun="getNumber"></number>
+							<type mode="2ndValue" type="integer" ndfun="longValue"
+								class="PhoneType"></type>
+						</phone2>
+
+						<phone3 type="object" fun="getPhone3" class="Phone">
+
+							<number type="printablestring" fun="getNumber"></number>
+							<type mode="2ndValue" type="integer" ndfun="longValue"
+								class="PhoneType"></type>
+						</phone3>
+
+						<phone4 type="object" fun="getPhone4" class="Phone">
+
+							<number type="printablestring" fun="getNumber"></number>
+							<type mode="2ndValue" type="integer" ndfun="longValue"
+								class="PhoneType"></type>
+						</phone4>
+						<url type="utf8string" fun="getUrl"></url>
+						<email type="utf8string" fun="getEmail"></email>
+						<enhPOIurl type="utf8string" fun="getEnhPOIurl"></enhPOIurl>
+
+						<useAsDestination type="boolean" fun="getUseAsDestination"></useAsDestination>
+						<geoCoordinates type="object" fun="getGeoCoordinates"
+							class="BasicPosition">
+							<latitude type="integer"></latitude>
+							<longitude type="integer"></longitude>
+						</geoCoordinates>
+						<useAsDestination type="boolean"></useAsDestination>
+						<enhPOIurl type="utf8string"></enhPOIurl>
+						<attributes mode="array" type="object"
+							arrayclass="PointOfInterest$Attributes" class="PointOfInterestAttribute">
+							<key type="printablestring"></key>
+							<value type="utf8string">
+							</value>
+						</attributes>
+
+
+					</poi>
+					<point type="object" fun="getChosenValue" choice="14"
+						class="BasicPosition">
+						<latitude type="integer"></latitude>
+						<longitude type="integer"></longitude>
+					</point>
+					<position type="object" fun="getChosenValue" choice="15"
+						class="FullPosition">
+						<basicPos type="object" class="BasicPosition">
+							<latitude type="integer"></latitude>
+							<longitude type="integer"></longitude>
+						</basicPos>
+						<extendedPos type="object" class="ExtendedPosition">
+							<altitudeMtr type="integer"></altitudeMtr>
+							<headingDeg type="integer"></headingDeg>
+							<reliability type="object" class="PositionReliability">
+								<fixType mode="2ndValue" type="integer" ndfun="longValue"
+									class="GnssFixType"></fixType>
+								<insideDigitizedArea mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+								<fullyDigitizedArea mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+								<matchedToDigitalMap mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+								<deadReckoning mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></deadReckoning>
+								<drCalibrated mode="2ndValue" type="integer" ndfun="longValue"
+									class="BOOLEXT"></drCalibrated>
+								<drDistanceMtr type="integer"></drDistanceMtr>
+								<hdopx10 type="integer"></hdopx10>
+								<noOfSatellites type="integer"></noOfSatellites>
+								<differentialGPSAvailable mode="2ndValue"
+									type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+							</reliability>
+							<fixtime type="object" class="TimeStamp">
+								<seconds type="integer"></seconds>
+							</fixtime>
+							<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+						</extendedPos>
+
+
+					</position>
+					<positions mode="array" type="object" fun="getChosenValue"
+						choice="16" arrayclass="GenericParameterValue$Positions" class="FullPosition">
+						<!-- 所有点 Full 选择的值是数组 -->
+						<basicPos type="object" class="BasicPosition">
+							<latitude type="integer"></latitude>
+							<longitude type="integer"></longitude>
+						</basicPos>
+						<extendedPos type="object" class="ExtendedPosition">
+							<altitudeMtr type="integer"></altitudeMtr>
+							<headingDeg type="integer"></headingDeg>
+							<reliability type="object" class="PositionReliability">
+								<fixType mode="2ndValue" type="integer" ndfun="longValue"
+									class="GnssFixType"></fixType>
+								<insideDigitizedArea mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+								<fullyDigitizedArea mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+								<matchedToDigitalMap mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+								<deadReckoning mode="2ndValue" type="integer"
+									ndfun="longValue" class="BOOLEXT"></deadReckoning>
+								<drCalibrated mode="2ndValue" type="integer" ndfun="longValue"
+									class="BOOLEXT"></drCalibrated>
+								<drDistanceMtr type="integer"></drDistanceMtr>
+								<hdopx10 type="integer"></hdopx10>
+								<noOfSatellites type="integer"></noOfSatellites>
+								<differentialGPSAvailable mode="2ndValue"
+									type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+							</reliability>
+							<fixtime type="object" class="TimeStamp">
+								<seconds type="integer"></seconds>
+							</fixtime>
+							<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+						</extendedPos>
+
+					</positions>
+					<trackPoint type="object" fun="getChosenValue" choice="17"
+						class="TrackPoint">
+						<!-- 2414 999 -->
+						<trigger type="integer" mode="2ndValue" ndfun="longValue"
+							class="TriggerType"></trigger>
+						<systemTime type="object" class="TimeStamp">
+							<seconds type="integer"></seconds>
+						</systemTime>
+						<!-- <collectionId type="object" class="CollectionId"> -->
+						<!-- <CollectionId type="integer"></CollectionId> -->
+						<!-- </collectionId> -->
+						<collectionId type="integer" mode="2ndValue" ndfun="longValue"
+							setmode="2ndValue" class="CollectionId">
+						</collectionId>
+						<vehicle type="object" class="VehicleTrackPointData">
+							<odometer type="object">
+								<meterResolution type="boolean"></meterResolution>
+								<odometerValueMtr type="integer"></odometerValueMtr>
+							</odometer>
+							<speedKmphx10 type="integer"></speedKmphx10>
+							<vehicleState type="integer" mode="2ndValue" ndfun="longValue"
+								class="VehicleStateType"></vehicleState>
+						</vehicle>
+						<fuel type="object" class="FuelTrackPointData">
+							<consFuelLtrx5000 type="integer"></consFuelLtrx5000>
+							<consElWhx5 type="integer"></consElWhx5>
+							<regElWhx5 type="integer"></regElWhx5>
+						</fuel>
+						<gnss type="object" class="FullPosition">
+							<!-- 所有点 Full 选择的值是数组 -->
+							<basicPos type="object" class="BasicPosition">
+								<latitude type="integer"></latitude>
+								<longitude type="integer"></longitude>
+							</basicPos>
+							<extendedPos type="object" class="ExtendedPosition">
+								<altitudeMtr type="integer"></altitudeMtr>
+								<headingDeg type="integer"></headingDeg>
+								<reliability type="object" class="PositionReliability">
+									<fixType mode="2ndValue" type="integer" ndfun="longValue"
+										class="GnssFixType"></fixType>
+									<insideDigitizedArea mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></insideDigitizedArea>
+									<fullyDigitizedArea mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></fullyDigitizedArea>
+									<matchedToDigitalMap mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></matchedToDigitalMap>
+									<deadReckoning mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></deadReckoning>
+									<drCalibrated mode="2ndValue" type="integer"
+										ndfun="longValue" class="BOOLEXT"></drCalibrated>
+									<drDistanceMtr type="integer"></drDistanceMtr>
+									<hdopx10 type="integer"></hdopx10>
+									<noOfSatellites type="integer"></noOfSatellites>
+									<differentialGPSAvailable mode="2ndValue"
+										type="integer" ndfun="longValue" class="BOOLEXT"></differentialGPSAvailable>
+								</reliability>
+								<fixtime type="object" class="TimeStamp">
+									<seconds type="integer"></seconds>
+								</fixtime>
+								<gnssSpeedKmph type="integer"></gnssSpeedKmph>
+							</extendedPos>
+						</gnss>
+						<gsm type="object" class="NetworkInformation">
+							<status mode="2ndValue" type="integer" ndfun="longValue"
+								class="NetworkRegistrationStatus"></status>
+							<location mode="choice" type="object" ndfun="getChosenFlag"
+								choiceclass="NetworkLocation">
+								<gsmNwLocation type="object" fun="getChosenValue"
+									choice="1" class="GsmNetworkLocation">
+									<mcc type="integer"></mcc>
+									<mnc type="integer"></mnc>
+									<lac type="integer"></lac>
+									<ci type="integer"></ci>
+									<bsic type="integer"></bsic>
+								</gsmNwLocation>
+								<umtsNwLocation type="object" fun="getChosenValue"
+									choice="2" class="UmtsNetworkLocation">
+									<mcc type="integer"></mcc>
+									<mnc type="integer"></mnc>
+									<lac type="integer"></lac>
+									<ci type="integer"></ci>
+
+								</umtsNwLocation>
+								<lteNwLocation type="object" fun="getChosenValue"
+									choice="3" class="LteNetworkLocation">
+									<mcc type="integer"></mcc>
+									<mnc type="integer"></mnc>
+									<eNB type="integer"></eNB>
+									<pci type="integer"></pci>
+								</lteNwLocation>
+							</location>
+							<rxLevelPerc type="integer"></rxLevelPerc>
+						</gsm>
+						<security type="object" class="SecurityTrackPointData">
+							<tuPowerSrc mode="2ndValue" type="integer" ndfun="longValue"
+								class="TUPowerSource"></tuPowerSrc>
+							<backupBattery type="object" class="TUBackupBatteryStatus">
+								<primaryVoltx10 type="integer"></primaryVoltx10>
+								<primaryChargePerc type="integer"></primaryChargePerc>
+								<secondaryVoltx10 type="integer"></secondaryVoltx10>
+								<secondaryChargePerc type="integer"></secondaryChargePerc>
+							</backupBattery>
+							<mainBattery mode="2ndValue" type="integer" ndfun="longValue"
+								class="MainBatteryStatus"></mainBattery>
+							<engineBlock mode="2ndValue" type="integer" ndfun="longValue"
+								class="EngineBlockedStatus"></engineBlock>
+							<brazilEventMode mode="2ndValue" type="integer"
+								ndfun="longValue" class="BOOLEXT"></brazilEventMode>
+							<timeToNextTpSec type="integer"></timeToNextTpSec>
+						</security>
+
+						<ext mode="choice" ndfun="getChosenFlag" type="object"
+							choiceclass="TrackPointExtension">
+							<none type="null" fun="getChosenValue" choice="1"></none>
+							<ecoRating type="integer" fun="getChosenValue" choice="2"></ecoRating>
+						</ext>
+					</trackPoint>
+					<setOk type="null" fun="getChosenValue" choice="18"></setOk>
+					<failedNotAllowed type="null" fun="getChosenValue"
+						choice="19"></failedNotAllowed>
+					<setFailedWrongType type="null" fun="getChosenValue"
+						choice="20"></setFailedWrongType>
+					<setFailedValueOutOfRange type="null"
+						fun="getChosenValue" choice="21"></setFailedValueOutOfRange>
+					<failedKeyNotSupported type="null" fun="getChosenValue"
+						choice="22"></failedKeyNotSupported>
+				</value>
+			</genericParams>
+			<errorCodes mode="array" type="arraychoice" ndfun="getChosenFlag"
+				arrayclass="NGTPDownlinkCore$ErrorCodes" choiceclass="NGTPDownlinkCore$ErrorCodes"
+				class="ErrorCode">
+				<!-- 数组 的每个值都是选择 -->
+
+				<incorrectSequence type="null" fun="getChosenValue"
+					choice="1"></incorrectSequence>
+				<incorrectEct type="null" fun="getChosenValue" choice="2"></incorrectEct>
+				<incorrectState type="null" fun="getChosenValue"
+					choice="3"></incorrectState>
+				<notAllowed type="null" fun="getChosenValue" choice="4"></notAllowed>
+				<invalidData type="null" fun="getChosenValue" choice="5"></invalidData>
+				<invalidFormat type="null" fun="getChosenValue"
+					choice="6"></invalidFormat>
+				<outOfMemory type="integer" fun="getChosenValue" choice="7"></outOfMemory>
+				<noOngoingService type="null" fun="getChosenValue"
+					choice="8"></noOngoingService>
+				<vehiclePowerModeNotCorrect type="null"
+					fun="getChosenValue" choice="9"></vehiclePowerModeNotCorrect>
+				<conditionsNotCorrect type="null" fun="getChosenValue"
+					choice="10"></conditionsNotCorrect>
+				<executionFailure type="null" fun="getChosenValue"
+					choice="11"></executionFailure>
+				<fuelLevelTooLow type="null" fun="getChosenValue"
+					choice="12"></fuelLevelTooLow>
+				<batteryLevelTooLow type="null" fun="getChosenValue"
+					choice="13"></batteryLevelTooLow>
+				<runTimeExpiry type="null" fun="getChosenValue"
+					choice="14"></runTimeExpiry>
+				<theftEvent type="null" fun="getChosenValue" choice="15"></theftEvent>
+				<crashEvent type="null" fun="getChosenValue" choice="16"></crashEvent>
+				<timeout type="null" fun="getChosenValue" choice="17"></timeout>
+				<windowNotClosed type="null" fun="getChosenValue"
+					choice="18"></windowNotClosed>
+				<hazardWarningOn type="null" fun="getChosenValue"
+					choice="19"></hazardWarningOn>
+				<vehicleNotLocked type="null" fun="getChosenValue"
+					choice="20"></vehicleNotLocked>
+				<alarmActive type="null" fun="getChosenValue" choice="21"></alarmActive>
+				<brakePedalPressed type="null" fun="getChosenValue"
+					choice="22"></brakePedalPressed>
+				<vehicleNotStationary type="null" fun="getChosenValue"
+					choice="23"></vehicleNotStationary>
+				<transmissionNotInPark type="null" fun="getChosenValue"
+					choice="24"></transmissionNotInPark>
+				<climateModeNotCorrect type="null" fun="getChosenValue"
+					choice="25"></climateModeNotCorrect>
+				<genericError mode="subchoice" type="printablestring"
+					fun="getChosenValue" choice="26"></genericError>
+
+			</errorCodes>
+		</downlink>
+	</serviceDataCoreMessage>
+
+
+
+</NGTPServiceData>
+
+

@@ -1,0 +1,363 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>hoperun</groupId>
+	<artifactId>proxy</artifactId>
+	<version>1001.01-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Proxy</name>
+	<url>http://maven.apache.org</url>
+	<!-- 持续集成信息 -->
+	<ciManagement>
+		<system>Hudson</system>
+		<url>http://172.32.5.45/develop/hudson</url>
+		<notifiers>
+			<notifier>
+				<type>mail</type>
+				<sendOnError>true</sendOnError>
+				<sendOnFailure>true</sendOnFailure>
+				<sendOnSuccess>false</sendOnSuccess>
+				<sendOnWarning>false</sendOnWarning>
+				<address />
+				<configuration />
+			</notifier>
+		</notifiers>
+	</ciManagement>
+	<inceptionYear>2013</inceptionYear>
+	<!-- 邮件列表 -->
+	<mailingLists>
+		<mailingList>
+			<name>杨卫君</name>
+			<post>weijun.yang@sirun.net</post>
+			<subscribe>weijun.yang@sirun.net</subscribe>
+			<unsubscribe>weijun.yang@sirun.net</unsubscribe>
+			<archive>http://mail.sirun.net</archive>
+		</mailingList>
+		<mailingList>
+			<name>田阳</name>
+			<post>yang.tian@sirun.net</post>
+			<subscribe>yang.tiang@sirun.net</subscribe>
+			<unsubscribe>yang.tian@sirun.net</unsubscribe>
+			<archive>http://mail.sirun.net</archive>
+		</mailingList>
+	</mailingLists>
+	<!-- 开发者列表 -->
+	<developers>
+		<developer>
+			<id>yangweijun</id>
+			<name>杨卫君</name>
+			<email>weijun.yang@sirun.net</email>
+			<url />
+			<roles>
+				<role>项目经理</role>
+				<role>研发经理</role>
+			</roles>
+			<organization>斯润天朗(北京)科技有限公司</organization>
+			<organizationUrl>http://www.sirun.net</organizationUrl>
+			<properties />
+			<timezone>8</timezone>
+		</developer>
+		<developer>
+			<id>tianyang</id>
+			<name>田阳</name>
+			<email>yang.tian@sirun.net</email>
+			<url />
+			<roles>
+				<role>开发工程师</role>
+			</roles>
+			<organization>斯润天朗(北京)科技有限公司</organization>
+			<properties />
+			<timezone>8</timezone>
+		</developer>
+	</developers>
+	<!-- 贡献者列表 -->
+	<contributors>
+		<contributor>
+			<name>韩烁</name>
+			<email>shuo.han@sirun.net</email>
+			<url />
+			<roles>
+				<role>产品经理</role>
+			</roles>
+			<organization>斯润天朗(北京)科技有限公司</organization>
+			<properties />
+			<timezone>8</timezone>
+		</contributor>
+	</contributors>
+	<!-- 代码库 -->
+	<scm>
+		<connection>scm:svn:http://172.32.5.45/wcarTU/SvnPath/SourceCode/Trunk/proxy
+		</connection>
+		<developerConnection>scm:svn:http://172.32.5.45/TService/SvnPath/SourceCode/Trunk/proxy
+		</developerConnection>
+		<tag>HEAD</tag>
+		<url />
+	</scm>
+	<organization>
+		<name>斯润天朗(北京)科技有限公司</name>
+		<url>http://www.sirun.net</url>
+	</organization>
+	<!-- 构建 -->
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<scriptSourceDirectory />
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<outputDirectory>target/classes</outputDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.hbm.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.properties</include>
+
+				</includes>
+			</resource>
+		</resources>
+		<finalName>proxy</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.7.2</version>
+				<configuration>
+					<forkMode>once</forkMode>
+					<argLine>-Dfile.encoding=UTF-8</argLine>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<!-- 使用useUniqueVersion，避免遇到快照版， MANIFEST.MF文件中记录的时间戳版本 -->
+							<useUniqueVersions>false</useUniqueVersions>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass></mainClass>
+						</manifest>
+					</archive>
+
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<!-- <execution> -->
+					<!-- <id>copy</id> -->
+					<!-- <phase>package</phase> -->
+					<!-- <goals> -->
+					<!-- <goal>copy-dependencies</goal> -->
+					<!-- </goals> -->
+					<!-- <configuration> -->
+					<!-- <outputDirectory>${project.build.directory}/lib</outputDirectory> -->
+					<!-- <overWriteReleases>false</overWriteReleases> -->
+					<!-- <overWriteSnapshots>false</overWriteSnapshots> -->
+					<!-- <overWriteIfNewer>true</overWriteIfNewer> -->
+					<!-- </configuration> -->
+					<!-- </execution> -->
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.1</version>
+					<configuration>
+						<url>http://localhost:8080/manager/html</url>
+						<server>tomcat</server>
+						<uriEncoding>UTF-8</uriEncoding>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>项目组内部仓库</name>
+			<url>http://172.32.5.45/artifactory/repo</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>snapshots</id>
+			<name>项目组内部仓库</name>
+			<url>http://172.32.5.45/artifactory/repo</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>central</id>
+			<name>项目组内部仓库</name>
+			<url>http://172.32.5.45/artifactory/repo</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>snapshots</id>
+			<name>项目组内部仓库</name>
+			<url>http://172.32.5.45/artifactory/repo</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.0-beta9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.0.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.struts</groupId>
+			<artifactId>struts2-core</artifactId>
+			<version>2.3.16</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>4.2.4.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>4.2.4.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.26</version>
+		</dependency>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz-jobs</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.4</version>
+			<classifier>jdk15</classifier>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.2.2</version>
+			<type>java-source</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.1.37</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.0.17.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>oss</groupId>
+			<artifactId>oss</artifactId>
+			<version>1001.01</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>oss</groupId>
+			<artifactId>ossmicro</artifactId>
+			<version>1001.01</version>
+		</dependency>
+		<dependency>
+			<groupId>oss</groupId>
+			<artifactId>ossmicrov</artifactId>
+			<version>1001.01</version>
+		</dependency>
+		<dependency>
+			<groupId>oss</groupId>
+			<artifactId>osstoed</artifactId>
+			<version>1001.01</version>
+		</dependency>
+
+		<dependency>
+			<groupId>hoperun</groupId>
+			<artifactId>pub</artifactId>
+			<version>1001.01-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>hoperun</groupId>
+			<artifactId>util</artifactId>
+			<version>1001.01-SNAPSHOT</version>
+		</dependency>
+		<!-- 数据库连接驱动 BoneCP -->
+		<dependency>
+			<groupId>com.jolbox</groupId>
+			<artifactId>bonecp</artifactId>
+			<version>0.8.0.RELEASE</version>
+		</dependency>
+
+	</dependencies>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+</project>

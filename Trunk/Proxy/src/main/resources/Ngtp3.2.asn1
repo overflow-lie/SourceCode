@@ -1,0 +1,3057 @@
+
+
+--filename:ngtp_services.asn
+
+--
+
+-- NGTP message format for NGTPServiceData 
+
+--
+
+-- For change history, see the Word document from which this file is exported
+
+--
+
+NGTP-Service-Data
+
+
+
+
+DEFINITIONS
+
+AUTOMATIC TAGS ::=
+
+BEGIN
+
+--========================================================================
+
+-- NGTP业务数据
+
+-- NGTPServiceData
+
+--
+
+--========================================================================
+
+--Protocol versions used in the dispatcher part.
+
+ProtocolVersionSingle8 ::= INTEGER (0..255)
+
+serviceDataMajorVersion ProtocolVersionSingle8 ::= 3
+
+serviceDataMinorVersion ProtocolVersionSingle8 ::= 2
+
+
+
+
+
+
+
+NGTPServiceData ::= SEQUENCE {
+
+  -- especially for uplink - to fulfill EU eCall requirements
+	-- 对于上行消息 满足欧盟要求的紧急呼叫要求
+  -- Generally set to FALSE if nothing else stated.
+	-- testFlag 在不做说明时设置为false
+  testFlag                BOOLEAN,
+
+  
+
+
+
+  --消息的类型 
+  messageType                 ServiceMessageType,  
+
+  --used if this message is an application acknowledge
+  -- 应用application应答使用标记
+  appAck                      Acknowledge OPTIONAL,
+
+  
+
+  -- can be set if an acknowledge is required on application level   
+  -- 假如当前消息是APP消息,那么必填
+  appAckRequired              BOOLEAN,
+
+  
+  --业务核心消息
+  serviceDataCoreMessage      NGTPCore OPTIONAL,
+
+  ... 
+
+}
+--消息的类型 
+ServiceMessageType::= ENUMERATED{
+
+   --Request/unsolicited message types
+
+   dataRequest           (0),
+
+   update                (1),
+
+   startRequest          (2),
+
+   terminateReq          (3),
+
+
+
+
+   --Response message types
+
+   dataResponse          (8),
+
+   actionResponse        (9),
+
+   acknowledge           (10)
+
+} 
+	--a(0..15)
+
+NGTPCore ::= CHOICE {
+
+  uplink      NGTPUplinkCore,
+
+  downlink    NGTPDownlinkCore
+
+}
+
+--========================================================================
+
+--
+
+-- UPLINK CORE
+
+--
+
+--========================================================================
+
+
+
+--上行核心消息
+NGTPUplinkCore ::= SEQUENCE {
+		--拓展的位置信息
+  positionExtension       ExtendedPosition                          OPTIONAL,
+		--基础的位置信息
+  vehicleStatus           BasicVehicleStatus                        OPTIONAL,
+		--拓展的车辆状态
+  extendedVehicleStatus   ExtendedVehicleStatus                     OPTIONAL,
+		--仪表板状态
+  dashboardStatus         DashboardStatus                           OPTIONAL,
+		--电动车状态
+  electricVehicleStatus   ElectricVehicleStatus                     OPTIONAL,
+		--气候状态
+  climateStatus           ClimateStatus                             OPTIONAL,
+		--TU状态
+  tuStatus                TelematicUnitStatus                       OPTIONAL,
+		--pearlChain(珍珠链??)
+  pearlChain              BasicPearlChain                           OPTIONAL,
+		--最后GPS时间戳
+  lastGPSTimeStamp           TimeStamp                                 OPTIONAL,
+
+  vin                     VIN                                       OPTIONAL,
+		--导航信息
+  navigationInformation   NavigationInformation                     OPTIONAL,
+		--POI内存状态
+  memoryStatus            POIMemoryStatus                           OPTIONAL,
+		--车辆燃料类型
+  vehiclePropulsionType   VehiclePropulsionType                     OPTIONAL,
+		--碰撞数据
+  crashData               CrashInformation                          OPTIONAL,
+		--远程操作响应列表
+  remoteOperationResponse RemoteOperationResponseList               OPTIONAL,
+		--通用TEXT
+  genericText             GenericText                               OPTIONAL,
+		--通用参数 [255]
+  genericParameters       SEQUENCE SIZE(0..255) OF GenericParameter OPTIONAL,
+		--触发[15]
+  trigger                  SEQUENCE SIZE(0..15) OF TriggerType       OPTIONAL,
+		--故障告警[15]
+  alerts                  SEQUENCE SIZE(0..15) OF AlertType         OPTIONAL,
+		--轨迹点
+  trackpoints             SEQUENCE SIZE(0..127)OF TrackPoint        OPTIONAL,
+		--旅途情况
+  journeys                SEQUENCE SIZE(0..127)OF JourneySummary    OPTIONAL,
+
+
+
+		--MSD信息
+  msdInfo                 MSDInformation                            OPTIONAL,
+		--Debug信息
+  debugInfo           	  SEQUENCE SIZE(0..10) OF DebugInfo		  OPTIONAL,
+		--错误代码
+  errorCodes              SEQUENCE SIZE(0..255) OF ErrorCode        OPTIONAL,
+
+  
+
+  ...
+
+}
+
+--========================================================================
+
+--
+
+-- DOWNLINK CORE
+
+--
+
+--========================================================================
+
+
+
+
+NGTPDownlinkCore ::= SEQUENCE {
+	--POI数据
+  poiDataSet       SEQUENCE SIZE(0..15) OF PointOfInterest OPTIONAL,
+	--远程操作请求列表
+  remoteOperations RemoteOperationRequestList              OPTIONAL,
+	--通用信息
+  genericText      GenericText                             OPTIONAL,
+	--Tu配置信息
+  configuration    TuConfiguration                         OPTIONAL,
+
+  genericParams   SEQUENCE SIZE(0..255) OF GenericParameter OPTIONAL,  --See the configuration chapter for limitations on the number and types of parameters allowed
+
+  errorCodes              SEQUENCE SIZE(0..255) OF ErrorCode     OPTIONAL,
+
+
+
+
+  ...
+
+}
+
+RemoteOperationRequestList ::= SEQUENCE {
+
+
+
+
+   -- The Remote operation script version
+
+   operationScriptVersion MajMinVersion16,
+	--远程操作脚本版本 
+   
+	--触发条件
+   executionTrigger RemoteOperationTrigger,
+
+  
+
+   -- The name of the remote operation.
+   --这个名字是远程操作名称
+   -- If this attribute names a well known remote operation then the 
+   --假如可以确定动作,可以不写
+   -- remoteOperations list may be empty.
+
+   name RemoteOperationName OPTIONAL,
+
+   
+
+   -- The amount of time between executions (1/10 second).
+  --在合适结束
+   periodSecx10 INTEGER (0..1023) OPTIONAL,
+
+  
+
+   -- Number of times this operation may occur.  -1 indicates no limit.
+
+   occurs INTEGER (-1..65534) OPTIONAL,
+
+  
+
+   -- List of Remote Operations to be executed. The list is ordered with the first operation in the list to be executed first.
+
+   -- This list may be empty if a well known remote operation name has been specified
+   --要执行远程操作的列表。列表被排序，以首先执行列表中的第一个操作。 
+   -- 这个列表可能是空的，如果已指定一个众所周知的远程操作名称 
+   remoteOperations SEQUENCE SIZE(0..31) OF RemoteOperationRequest,
+
+   ...
+
+}
+
+
+
+
+RemoteOperationName ::= ENUMERATED {
+
+--These are commands to be executed by the adressed service in the TU.The result is service dependant.
+
+--Note: The list of services implementing a certain command is included for easier understanding and may not be fully correct or exhaustive. Not all commands are currently used
+
+   rotNameEnd,     --End a service (eCall, bCall, SVT, TN)
+
+   rotNameStart,     --Start a service (SVT)
+
+   rotNamePause,     --Pause a service
+
+   rotNameRestart,     --Restart a running or paused service
+
+   rotNameConfigure,   --Configure a service
+
+   rotNameGet,    --Request updated data (eCall, bCall, SVT HC,RVS) 
+
+   rotNameGetPos,    --Request updated data including position, only for services where the position is optional (HC, RVS)   
+
+   rotNameCleardown,  --Instruction for TU to expect CSC to hangup the voice call (eCall, bCall)
+
+   rotNameCallback,  --Request service to call to CSC
+
+   rotNameBlock,   --RVI block engine
+
+   rotNameUnblock,   --RVI unblock engine
+
+   --Note, rotNameEnd will end TN and all related services: SVT, RVI Blocking, UDD
+
+   rotNameEndTnOnly,          --End TN but do not affect related services
+
+   rotNameEndTnEndSvt,          --End TN and any ongoing tracking
+
+   rotNameEndTnUnblock,         --End TN and unblock the vehicle
+
+   rotNameDeactivate,          -- Take TU to deactivated unprovisioned state (may not be allowed by TU)
+
+   rotNamePreactivate,         -- Take TU to preactivated unprovisioned state (may not be allowed by TU)
+
+   rotNameActivate,            -- Take TU to activated unprovisioned state
+
+   rotNameProvision,            -- Take TU to activated provisioned state
+
+   rotNameHeat,                 -- Start heating
+
+   rotNameVent,                 -- Start venting
+
+   rotNameAuto                 -- Start auto operation (e.g. auto pre-conditioning).
+
+}
+--(0..255)
+
+RemoteOperationTrigger ::= CHOICE
+
+{
+
+  -- no condition. do action immediately.
+  --没有条件。马上做动作。
+  now                      NULL,
+
+  
+
+  -- execute whenever is convenient for TU
+  --当TU方便执行时
+  at-convenience           NULL,
+
+
+
+
+  -- periodically do action.
+  --定期动作。
+  periodic                 SEQUENCE
+
+  {
+
+    -- 1 sec (max one year). period == 0 means: execute once.
+	--周期,  单位秒 .有效范围为 1到一年  365*24*60*60,0表示执行一次
+    periodSec              INTEGER (0..31536000),
+	--开始时间
+    startAt                TimeStamp
+
+  },
+
+
+
+
+  -- execute as soon as possible but not later than the specified time
+
+  no-later-than            TimeStamp,
+
+  
+
+  -- The contents of this trigger is OEM specific
+
+  generic                  OCTET STRING (SIZE(0..1024)),
+
+
+
+
+  -- do action after a distance have been travelled
+
+  -- 100 m (100 - 100.000.000m)
+
+  distanceMtrx100             INTEGER (1..1000000),
+
+
+
+
+  -- do action when velocity exceeds a certain speed
+
+  -- 1 km/h    (0 - 255 km/h)
+
+  movementKmph             INTEGER (0..255),
+
+
+
+
+  -- do action when vehicle has not been moving for this long
+
+  -- 1 sec    (max 1 day)
+
+  noMovementSec            INTEGER (0..86400),
+
+
+
+
+  -- do action when engine starts
+
+  engineOn                 NULL,
+
+
+
+
+  -- do action when engine is turned off
+
+  engineOff                NULL,
+
+
+
+
+  -- do action when ignition is turned on
+
+  ignitionOn                NULL,
+
+
+
+
+  -- do action when ignition is turned off
+
+  ignitionOff                NULL,
+
+
+
+
+  -- do action when door status changes
+
+  -- trigger on open/close or both
+
+  doorStatusChange         ENUMERATED
+
+  {
+
+    open,
+
+    close,
+
+    both
+
+  },
+
+
+
+
+  -- Warnings to the driver except open doors
+
+  vehicleTechnicalWarning  NULL,
+
+
+
+
+  -- Vehicle error conditions
+
+  vehicleError             NULL,
+
+
+
+
+  -- do action when fuel level reaches limits
+
+  -- 0-100% of total
+
+  fuelLevelChangedAbovePerc    INTEGER (0..100),
+
+  fuelLevelChangedBelowPerc    INTEGER (0..100),
+
+
+
+
+  -- do action when temperature reaches limits
+
+  -- -100 - 100 degree celcius
+
+  internalTemperatureAboveDeg INTEGER (-100..100),
+
+  internalTemperatureBelowDeg INTEGER (-100..100),
+
+
+
+
+  externalTemperatureAboveDeg INTEGER (-100..100),
+
+  externalTemperatureBelowDeg INTEGER (-100..100)
+
+
+
+
+}
+
+RemoteOperationRequest ::= SEQUENCE {
+
+
+
+
+  -- The remote operation description
+	--这个远程操作的详细说明
+  operationDesc          SimpleRemoteOperation,
+
+
+
+
+  -- Indicates that the execution of subsequent operations in a list should stop if the execution of this operation fails.
+	-- 假如失败后是否继续后面步骤
+  stopIfFail             BOOLEAN,
+
+  
+
+  -- Indicates if the previous command should complete before this operation is executed.
+	--等待上一次命令
+  waitForPreviousCommand BOOLEAN,
+
+  
+
+  -- Number of seconds before this operation times out
+  --超时时间
+  operationTimeoutSec       INTEGER (0..1023),
+
+
+
+
+  -- The amount of time between executions (1/10 second).
+  -- 结束时间
+  periodSecx10            INTEGER (0..1023),
+
+  
+
+  -- Number of times this operation may occur.  -1 indicates no limit.
+
+  occurs                 INTEGER (-1..65534),
+
+  
+
+  -- Amount of time to wait before this operation executes (1/10 second)
+  --最初等待时间
+  initialWaitTimeSecx10    INTEGER (0..1023),
+
+
+
+
+   -- vehicle states required to be fulfilled when this operation is to be executed(moving, ign on/off, engine on/off, ...) 
+
+   requiredVehicleStates VehicleStateType OPTIONAL,
+
+   ...
+
+     
+
+}
+
+VehicleStateType ::= ENUMERATED {
+	--发动机开着并且移动中
+  engine-on-moving         (0), -- Powermode=Running and VehicleSpeed>0
+	--发动机开着,但未移动
+  engine-on-park           (1), -- Powermode=Running and VehicleSpeed=0
+	--车锁打开,但引擎关闭
+  key-on-engine-off        (2), -- Powermode=Ignition or Acessory
+	--?
+  delayed-accessory        (3), -- Powermode=PostAcessory ?
+	--钥匙关闭
+  key-off                  (4), -- Powermode=Key inserted
+	--未插要是
+  key-removed              (5), -- Powermode=Key out
+	--远程启动的发动机
+  engine-on-remote-start   (6), -- Engine is started from remote
+
+
+
+	--CanBus没有响应或者未连接CanBus
+  unknown                  (15)  -- CAN bus asleep or TU is not connected to CAN
+
+}
+--(0..15)
+
+
+
+
+SimpleRemoteOperation ::= SEQUENCE {
+
+  
+
+  -- The vehicle component this Operation addresses.
+  -- 这个车辆操作的地址
+  component              PrintableString (SIZE(0..256)),
+
+  
+
+  -- Type of operation to execute
+  -- 执行的操作类型
+  operationType          RemoteOperationType,
+
+  
+
+  -- The Components state the operationType returns true for when the response should be sent to the network.
+  -- 在返回至网络是 应该有数据返回
+  state                  UTF8String (SIZE(0..65535)) OPTIONAL,
+
+  ...
+
+}
+
+RemoteOperationType ::= ENUMERATED {
+
+   read                      (0),
+
+   write                     (1),
+
+   diagnostics-cancel        (2),
+
+   read-async                (3),
+
+   write-async               (4),
+
+   diagnostics-read          (5),
+
+   diagnostics-write         (6),
+
+   diagnostics-track         (7),
+
+   diagnostics-read-interval (8)
+
+} 
+--(0..31)
+
+RemoteOperationResponseList ::= SEQUENCE {
+
+
+
+
+	-- The Remote operation script version
+	-- 这个远程操作使用的版本
+    operationScriptVersion   MajMinVersion16,
+
+    
+
+    -- Number of times this operation has been executed (a.k.a hasOccurred)
+	-- 当前操作被执行过的次数(或者已经发生的次数)
+    timesExecuted            INTEGER(0..65535) OPTIONAL,
+
+  
+
+    -- Time when the request was last executed (successfully or not).
+	-- 最后一次执行的时间(不管成功与否)
+    lastExecuted             TimeStamp OPTIONAL,
+	--返回结果 (数组)
+    responses                SEQUENCE SIZE(1..31) OF RemoteOperationResponse,
+
+    ...
+
+}
+
+RemoteOperationResponse ::= SEQUENCE {
+
+  --The RemoteOperation
+  --这个远程操作
+		--对操作的返回(操作的说明)
+  operationDesc      SimpleRemoteOperation,
+
+
+
+
+  -- Number of times this operation has been executed (a.k.a hasOccurred)
+  -- 该操作已经被执行的次数
+  timesExecuted      INTEGER(0..65535),
+
+  
+
+  -- Time when the request was last executed (successfully or not).
+	-- 最后一次执行的时间(不管成功与否)
+  lastExecuted       TimeStamp,
+
+  
+
+  -- Error description in case of execution error.
+  -- 在执行错误时的描述
+  errorDesc          PrintableString (SIZE(1..256)) OPTIONAL,
+
+  ...
+
+}
+
+MajMinVersion16 ::= SEQUENCE {
+
+  majorVersion    ProtocolVersionSingle8,
+
+  minorVersion    ProtocolVersionSingle8
+
+}
+
+
+
+
+TuConfiguration ::= SEQUENCE {
+
+   --Configuration version, selected by TSP. 
+   --配置的版本由TSP选择
+
+   configVersion        TuConfigVersion,
+
+   --List of countries and country specific configurations
+	--国家 的具体配置(涉及有关应用的参数)
+   countries            SEQUENCE SIZE(0..255) OF CountryConfigurationBlock,
+
+   -- Everything which is not country specific will be configured through genericParameters. This includes which applications are provisioned. See Appendix D ?Generic Parameters
+
+   ...
+
+}
+
+CountryConfigurationBlock ::= SEQUENCE
+
+{
+
+       --List of applications enabled in this country. If omitted, the global setting applies. Note: Currently not supported.
+		--在这个国家的应用程序列表。如果省略该参数，则全局设置适用。注意：目前不支持。
+    applications  SEQUENCE SIZE (0..31) OF INTEGER (0..255) OPTIONAL,
+
+
+
+
+    validCountryCode   INTEGER(0..4095), --The MCC for which this Block applies
+
+    applicationConfig  ApplicationConfiguration,
+
+    --Addresses to use for external communication. Currently only phone numbers.
+
+    addresses     SEQUENCE SIZE (0..15) OF AddressBlock,
+
+    activated     BOOLEAN, --A possibility to configuring a Block without allowing it to be used.
+
+    ...
+
+}
+
+--A list of application specific configurations which vary with the country in which the vehicle is located
+
+ApplicationConfiguration::=SEQUENCE {
+
+  eCall-requestCscNumber    BOOLEAN,  --Try to obtain a phone number from TSP before dialling private eCall or bCall. Note: An ecall/bCall number must always exist in the database for a private eCall/bCall to be attempted. (Currently not implemented. TU will always request a number)
+
+  --Control if and how calls to PSAP through  network emergency call request can be used. Note that Great Britain, although the service center is public, is ?at least currently - treated as a �private?eCall country where �eCall?phone number shall be provisioned to 15999. �psapType?shall therefore be provisioned to �manualOnly?or �notAllowed?
+
+  eCall-psapType   ENUMERATED {  
+
+             notAllowed (0),   --An emergency call (manual or automatic) to PSAP shall never be made. Equivalent to not setting any of the psap numbers.
+
+             manualOnly (1),   --PSAP may only be called if a human has manually authorized the call.
+
+             autoAllowed (2),  --Automatic emergency calls to normal PSAP is allowed and should be used as backup if private CSC can not be reached.
+
+             eUeCall (3)  --The country has infrastructure supporting eCall according to European standard with in-band modem. This setting is to be used also for Russia
+
+             } ,
+		--  (0..7)
+
+  ...
+
+}
+
+
+
+
+AddressBlock ::= SEQUENCE
+
+{
+
+    addressId          INTEGER (0..255),  --Block id chosen by TSP. Context: This TuConfiguration block. Either references another AdressBlock from which data shall be taken or is used as a a reference by other blocks. (Depending on AdressType below)
+
+    address            AddressType,      --Specifies details for a communication network and an address (normally a phone number) OR that data (TBD exactly what data?) shall be taken from an existing record with id=addressId
+
+    addressUsage        ENUMERATED 
+
+                       {
+
+                           smsc,         --Smsc-number. Not supported by TU
+
+                           destination,  --SMS destination number
+
+                           ecall,        --service center voice call number for eCall
+
+                           ecall-backup, --ecall backup number (Currently not used)
+
+                           bcall,        --service center voice call number for bCall
+
+                           psap,         --Number to PSAP for manual emergency call. When eCall-psapType is eUeCall, this number will be used only for test eCalls.
+
+                           psap-auto    --Number to PSAP for automatic emergency call. If not set, the �psap?number will be used also for automatic emergency calls. (This adress is currently not used)
+
+                       },
+                       --(0..31)
+
+   
+
+    ...
+
+}
+
+AddressType ::= CHOICE
+
+{
+
+    absolute        CommunicationAddress,
+
+    reference-id    NULL
+
+}
+-- (0..1)
+
+CommunicationAddress ::= SEQUENCE
+
+{
+
+    networkID     NetworkType, --The type of network to which this address applies.Not supported
+
+    validityRange ENUMERATED   --Not supported
+
+      {
+
+          unknown,
+
+          international,
+
+          national,
+
+          reserved
+
+      },
+
+    address       Address,  --The actual address. Currently only phone numbers are supported
+
+    ...
+
+}
+
+NetworkType ::= ENUMERATED
+
+{
+
+    unknown,
+
+    isdn-speech,
+
+    isdn-data,
+
+    gsm-speech,
+
+    gsm-sms,
+
+    gsm-bs24,
+
+    gsm-gprs,
+
+    x-25,
+
+    x-400-e-mail,
+
+    internet-e-mail,
+
+    reserved1,
+
+    tcp-ip,
+
+    udp-ip,
+
+    fax-group-2-3,
+
+    fax-group-4,
+
+    gsm-bs-26,
+
+    gsm-bs-26-udi,
+
+    gsm-speech-uus,
+
+    reserved (31)
+
+} 
+--(0..31)
+
+Address ::= CHOICE
+
+{
+
+    --Address in bcd coded format. Each entry in the sequence shall be either: 
+
+    -- A digit 0..9d for a phone number digit 0..9 or 
+
+    -- 10d for ??or 11d for ??or 12d for ??
+    address-bcd     SEQUENCE SIZE (0..20) OF INTEGER (0..15),
+
+    address-ascii   OCTET STRING (SIZE(0..20))-- Not supported
+
+}
+
+--Command to end TN service and possibly also related services.
+
+-- Note: The svtEnd and rviMobilize will be executed also if TN is not active
+	
+
+
+
+TNEndCmd ::= SEQUENCE {
+
+   tnEnd         NULL,                  --No real meaning except to illustrate that TN, if active, will always end
+
+   svtEnd        BOOLEAN DEFAULT TRUE,  -- If TRUE, Any ongoing tracking will be stopped.
+
+   rviMobilize   BOOLEAN DEFAULT TRUE,  --If TRUE, the vehicle will become mobilized if immobilized or blocked.
+
+   ...
+
+}
+--拓展的位置信息
+ExtendedPosition ::= SEQUENCE {
+	-- 高度
+  altitudeMtr        INTEGER(-100..8091) OPTIONAL,
+
+  headingDeg         INTEGER(0..359) OPTIONAL,
+	--可靠性
+  reliability     PositionReliability OPTIONAL,
+  	--当前时间
+  fixtime         TimeStamp OPTIONAL,
+	--全球导航卫星系统速度 千米每小时
+  gnssSpeedKmph   INTEGER(0..511) OPTIONAL,
+
+  ...            
+
+}
+
+PositionReliability ::= SEQUENCE {
+
+  fixType                     GnssFixType,
+
+  
+
+  --Map matching information
+
+  insideDigitizedArea         BOOLEXT, -- isUnused if TU-internal GPS is used
+
+  fullyDigitizedArea          BOOLEXT, -- isUnused if TU-internal GPS is used 
+
+  matchedToDigitalMap         BOOLEXT, -- isUnused if TU-internal GPS is used 
+
+
+
+
+  --Dead reckoning usage
+
+  deadReckoning               BOOLEXT,
+
+  --Dead reckoning calibration status
+
+  drCalibrated                BOOLEXT,
+
+  --Distance driven on dead reckoning, without any GNSS fix.
+
+  -- 4095 means >=4095
+
+  drDistanceMtr               INTEGER(0..4095),
+
+  --Hdop=satellite geometry
+
+  hdopx10                    INTEGER(0..127), --HDOP value multiplied by 10
+
+  --Number of satellites used in the fix
+
+  noOfSatellites              INTEGER(0..63),
+
+  differentialGPSAvailable    BOOLEXT, -- �isUnused�in current HW
+
+  ...
+
+}
+
+--Specify the fix type of the GNSS receiver. Note that the position may be 
+
+--valid even if fixtype=none due to dead reckoning
+
+GnssFixType::=ENUMERATED{
+
+   none        (0),
+
+   timeFix     (1),   --never used in the current HW
+
+-- ASNPARSER DOES NOT SUPPORT MEMBERS STARTING WITH A NUMERIC VALUE
+
+   fix2D       (2),
+
+   fix3D       (3),
+
+   fix3DHqFix     (4)  -- TRUE if the fix fulfills a number of internal criteria for being of high quality
+
+}
+--(0..15)
+
+TrackPoint ::= SEQUENCE {
+	--以实现
+  --The reason for taking the trackpoint
+  -- 行驶轨迹
+  trigger          TriggerType,
+
+  systemTime       TimeStamp,
+	--集合ID
+  collectionId     CollectionId, -- Note: SVT always uses 0
+	--车辆的信息
+  vehicle          VehicleTrackPointData OPTIONAL,
+	--燃料信息
+  fuel             FuelTrackPointData OPTIONAL,
+	--位置信息
+  gnss             FullPosition OPTIONAL,
+	--网络信息(含定位信息)
+  gsm              NetworkInformation OPTIONAL,
+	--安全信息
+  security         SecurityTrackPointData OPTIONAL,
+	--拓展数据
+  ext              TrackPointExtension,
+
+  ...
+
+}
+
+--An id selected by TU for each journey to make it possible for TSP to match track points to the correct journey even if the time stamps for some reason are not withing start/stop time.
+--跟踪点ID
+CollectionId ::= INTEGER(0..255)
+
+VehicleTrackPointData ::= SEQUENCE {
+--里程表数据
+  odometer             OdometerData,
+
+  -- speed in 1/10 kmph. Max value=unknown.
+  --速度单位为 1/10KMOG 4095为无效
+  speedKmphx10        INTEGER (0..4095),
+  --车辆当前状态
+  vehicleState        VehicleStateType,
+
+  ...
+
+}
+
+FuelTrackPointData ::= SEQUENCE {
+
+  --Consumed fuel since trip start in 1/5ml or 200uL step. Max value=unknown.
+  -- 消耗1/5或这200uL燃料经过的行程
+  consFuelLtrx5000      INTEGER (0.. 16777215) OPTIONAL, 
+
+  --Electrical consumption since trip start in 1/5 Wh or 200ukWh. Max value=unknown.
+  -- 消耗 1/5 Wh or 200ukWh 电量经过的行程
+
+  consElWhx5          INTEGER (0..16777215) OPTIONAL,
+
+  --Electrical regeneration since trip start in 1/5 Wh or 200ukWh. Max value=unknown. 
+  -- 消耗 1/5 Wh or 200ukWh 电量经过的行程
+
+  regElWhx5           INTEGER (0..16777215) OPTIONAL 
+
+
+
+
+}
+
+
+
+
+-- Information about the current network to make a rough positioning possible
+
+-- also without GNSS fix.
+
+-- The RX-level is included because it may be required in legal discussions to 
+
+-- prove that the car was outside coverage.
+
+--
+
+-- For security services and eCall, all known information should be included. 
+
+-- If TU is not registered in any network it may include cell information from any
+
+-- other base station seen
+
+
+
+
+NetworkInformation ::= SEQUENCE {
+	--网络注册状态
+  status         NetworkRegistrationStatus,
+
+  location       NetworkLocation OPTIONAL,
+
+  
+
+  --Rx level in percent of the maximum level
+
+  rxLevelPerc    INTEGER(0..100)
+
+}
+
+
+
+
+
+
+
+NetworkRegistrationStatus ::= ENUMERATED {
+
+   notRegistered,
+
+   registered
+
+} 
+--(0..7)
+
+
+
+
+NetworkLocation ::= CHOICE {
+	--GSM网络定位
+   gsmNwLocation  [0]  GsmNetworkLocation,
+	--3G网络定位
+   umtsNwLocation [1]  UmtsNetworkLocation,
+	--4GLte网络定位
+   lteNwLocation  [2]  LteNetworkLocation
+
+}
+--(0..31)
+
+
+
+
+GsmNetworkLocation ::= SEQUENCE {
+	--国家代码
+  mcc            INTEGER(0..1023),   --country code
+	--网络代码
+  mnc            INTEGER(0..1023),   --network code
+	--地点数据
+  lac            INTEGER(0..65535),   --location area code
+	--
+  ci             INTEGER(0..65535),          --cell id
+	--基站标识。
+  bsic           INTEGER(0..63) OPTIONAL     --base station identity.    
+
+}
+
+
+
+
+UmtsNetworkLocation ::= SEQUENCE {
+
+  mcc            INTEGER(0..1023),   --country code
+
+  mnc            INTEGER(0..1023),   --network code
+
+  lac            INTEGER(0..65535),   --location area code
+
+  ci             INTEGER(0..4294967295)          --cell id
+
+}
+
+
+
+
+
+
+
+LteNetworkLocation ::= SEQUENCE {
+
+  mcc            INTEGER(0..1023),      --country code
+
+  mnc            INTEGER(0..1023),      --network code
+
+  eNB            INTEGER(0..1048575),   --eNodeB identifier
+
+  pci            INTEGER(0..503)        --�Physical Cell Id?
+}
+
+
+
+
+-- This data is used only for SVT
+
+SecurityTrackPointData ::= SEQUENCE {
+	--Tu电源信息
+   tuPowerSrc          TUPowerSource,
+	--备份电池状态
+   backupBattery       TUBackupBatteryStatus,
+	--主电池状态
+   mainBattery       MainBatteryStatus,
+	--发动机体状态
+   engineBlock         EngineBlockedStatus,
+	--巴西事件模式
+   brazilEventMode     BOOLEXT,  --unused except in Brazil
+
+   --Estimated time to next trackpoint. 0= last trackpoint, Max value=unknown
+	--预计下一时间点 0为最后跟踪点 最大值 未知
+   timeToNextTpSec     INTEGER (0..65535)      
+
+}
+
+--This extension is likely to be OEM and application specific
+-- 在OEM或者特殊应用时可能会使用
+TrackPointExtension ::= CHOICE {
+
+  --�none?is the used option if not specified otherwise
+
+  none      [0]     NULL,
+
+  ecoRating [1]     INTEGER(0..100)
+
+}
+--(0..31)
+
+PointOfInterest ::= SEQUENCE {
+	--主题
+  subject     	UTF8String(SIZE(0..255)),		        
+	--类别
+  category		UTF8String(SIZE(0..255)) OPTIONAL,	
+	--说明
+  freetext		UTF8String (SIZE(0..1023)) OPTIONAL,	
+	--名称
+  name		PersonName OPTIONAL,
+	--组织
+  organization	UTF8String(SIZE(0..255)) OPTIONAL,
+	--地址
+  address		PostalAddress OPTIONAL,
+	--电话
+  phone1		Phone OPTIONAL,		
+
+  phone2		Phone OPTIONAL,		
+
+  phone3		Phone OPTIONAL,		
+
+  phone4		Phone OPTIONAL,		
+
+  url			UTF8String(SIZE(0..255)) OPTIONAL,
+
+  email		UTF8String(SIZE(0..255)) OPTIONAL,
+	--位置信息
+  geoCoordinates	BasicPosition OPTIONAL,
+
+  useAsDestination 	BOOLEAN,
+
+  enhPOIurl       UTF8String(SIZE(0..1023)) OPTIONAL,	
+
+  attributes 	SEQUENCE SIZE(0..15) OF PointOfInterestAttribute OPTIONAL	
+
+}
+
+PostalAddress ::= SEQUENCE {
+
+  street		UTF8String(SIZE(0..255)) OPTIONAL,
+
+  houseNumber	UTF8String(SIZE(0..255)) OPTIONAL,
+
+  city		UTF8String(SIZE(0..255)) OPTIONAL,
+
+  region		UTF8String(SIZE(0..255)) OPTIONAL,
+
+  postalCode	UTF8String(SIZE(0..255)) OPTIONAL,
+
+  country		UTF8String(SIZE(0..255)) OPTIONAL
+
+}
+
+PersonName ::= SEQUENCE {
+
+  familyName UTF8String(SIZE(0..255)) OPTIONAL,
+
+  firstName  UTF8String(SIZE(0..255)) OPTIONAL,
+
+  middleName UTF8String(SIZE(0..255)) OPTIONAL,
+
+  prefix     UTF8String(SIZE(0..255)) OPTIONAL,
+
+  suffix     UTF8String(SIZE(0..255)) OPTIONAL
+
+}
+
+NavigationInformation ::= SEQUENCE {
+		--位置信息
+  destination		BasicPosition OPTIONAL,
+		--到达时间 时分
+  arrivalTime		TimeHM OPTIONAL, -- TimeToDestination         
+		--距离目的地Mtr
+  distanceToDestMtr	INTEGER(0..4095) OPTIONAL, -- 4095 means >= 4095
+		--剩下范围
+  remainingRange	INTEGER(0..4095) OPTIONAL
+
+}
+
+TimeHM ::= SEQUENCE {
+
+  hour      INTEGER(0..23),
+
+  minute    INTEGER(0..59)
+
+}
+
+Phone ::= SEQUENCE {
+
+  number    PrintableString(SIZE(0..27)),
+
+  type      PhoneType
+
+}
+
+PhoneType ::= ENUMERATED {
+
+  unknown         (0),
+
+  home            (1),
+
+  work            (2),
+
+  cell            (3)
+
+}
+
+PointOfInterestAttribute ::= SEQUENCE
+
+{
+
+  key      PrintableString (SIZE(0..63)),
+
+  value    UTF8String (SIZE(1..1024)) 
+
+}
+
+POIMemoryStatus ::= SEQUENCE {
+		--最多的数据量
+  maxPoiDataSets     INTEGER(0..127),
+		--当前空余数据库
+  freePoiDataSets    INTEGER(0..127)
+
+}
+
+FullPosition ::= SEQUENCE {
+
+  basicPos BasicPosition,
+
+  extendedPos ExtendedPosition 
+
+}
+
+BasicPearlChain ::= SEQUENCE SIZE(1..5) OF FullPosition 
+
+BasicVehicleStatus ::= SEQUENCE
+
+{
+	--车辆状态
+    state               VehicleStateType,
+	--主电池状态
+    mainBattery       MainBatteryStatus OPTIONAL,
+	--防盗报警状态
+    theftAlarm          TheftAlarmStatus OPTIONAL,
+
+    fuelLevelPerc       INTEGER (0..100) OPTIONAL,
+	-- SRS 状态信息
+    srs                 SRSStatus OPTIONAL,
+	-- 发动机缸体状态
+    engineBlock         EngineBlockedStatus,
+
+    brazilEventMode     BOOLEXT    --unused except in Brazil
+
+}
+
+EngineBlockedStatus ::= ENUMERATED {
+	--正常畅通
+  normalUnblocked   (0),
+	--挂起阻塞
+  pendingBlocking   (1),
+	--提供商锁定
+  blockedByTsp      (2), --A blocking message has been received from TSP. Can only be unblocked by Tsp
+	--TU锁定
+  blockedByTU       (3), -- Blocked due to local tampering. Can be unblocked by local action or by TSP.
+
+  unknown           (7)
+
+}
+
+ExtendedVehicleStatus ::= SEQUENCE
+
+{
+
+    panicAlarmTriggered BOOLEXT, 				--Currently not used
+
+    crashSituation BOOLEXT,
+
+    
+
+    -- tenths of volts, i.e. 143 == 14.3 volts
+
+    batteryVoltx10 INTEGER(0..255) OPTIONAL, 
+
+    windowStatus        WindowStatuses OPTIONAL,
+
+    doorStatus          DoorStatuses OPTIONAL,
+
+    cabOpenStatus       BOOLEXT,
+
+    sunroofOpenStatus   BOOLEXT,  --Currently not used
+
+    bootOpenStatus      BOOLEXT, --Currently not used
+
+
+
+
+    -- unit is deciliter, so 753==75.3 liters. 4095=invalid
+
+    fuelAmountDl        INTEGER (0..4095) OPTIONAL,
+
+    distToEmptyFuelKm   INTEGER (0..16383) OPTIONAL,      --16383=invalid,       
+
+    odometerValue       OdometerData OPTIONAL,            -- Odometer reading
+
+    tyreStatuses        TyreStatuses OPTIONAL,
+
+    engineCoolantTempDeg   INTEGER (-60..195) OPTIONAL,      --195=Unknown  Currently not used
+
+    headLightOn         BOOLEXT, 		  --Currently not used
+
+    vehicleDateTime     TimeHM OPTIONAL,	--Currently not used
+
+    ecoGrade            EcoGrade OPTIONAL,  --Currently not used
+
+
+
+
+    engHrsToSrvc        INTEGER (0..4095) OPTIONAL,       --4095=invalid Currently not used
+
+    kmToSrvc            INTEGER (0..65535) OPTIONAL,      --65535=invalid
+
+    monthsToSrvc        INTEGER (0..63) OPTIONAL,         -- 63=invalid Currently not used
+
+    srvcWarnStatus      ServiceWarningStatus OPTIONAL,  --Currently not used
+
+    srvcWarnTrigger     ServiceWarningTrigger OPTIONAL,  --Currently not used
+
+
+
+
+    bulbFailures        SEQUENCE SIZE (0..7) OF Bulb,
+
+    brakeFluidWarn      LiquidLevelWarning OPTIONAL,
+
+    engCoolantLevelWarn LiquidLevelWarning OPTIONAL,
+
+    oilLevelWarn        LiquidLevelWarning OPTIONAL,
+
+    oilPressureWarn     PressureWarning OPTIONAL,  --Currently not used
+
+    washerFluidWarn     LiquidLevelWarning OPTIONAL,
+
+
+
+
+    tripMeter1          OdometerData OPTIONAL,  --Currently not used
+
+    tripMeter2          OdometerData OPTIONAL,  --Currently not used
+
+    avgFuelConsCl       AvgFuelConsumptionCl OPTIONAL,    --Currently not used
+
+    avgSpeedKmph        INTEGER (0..255) OPTIONAL        --0=no value. Currently not used.    
+
+    
+
+}
+
+ClimateStatus ::= SEQUENCE
+
+{
+
+    timerActivationStatus     BOOLEXT,
+
+    timer1                    ClimateTimer,
+
+    timer2                    ClimateTimer,
+
+    climateOperatingStatus    ClimateOperatingStatus,
+
+    remainingRunTime          INTEGER (0..255), -- in minutes
+
+    ventingTime               INTEGER (0..31)  -- Time in minutes that Park Heating and Park Venting is allowed to operate. 0 is undefined. 22-31 unused in current implementation.
+
+}
+
+ClimateOperatingStatus ::= ENUMERATED
+
+{
+
+    off (0),
+
+    starting-up (1),
+
+    heating (2), 
+
+    venting (3), 
+
+    engine-heating (4),
+
+    shutting-down (5),
+
+    failure-low-voltage (6),
+
+    failure-low-fuel (7),
+
+    failure-service-required (8),
+
+    failure-system-failure (9),
+
+    failure-max-operational-time-reached (10),
+
+    stopped-by-user (11),
+
+    unknown(12)
+
+}
+
+ClimateTimer ::= SEQUENCE
+
+{
+
+    month             INTEGER (0..12) OPTIONAL,      -- 0=unknown
+
+    day               INTEGER (0..31) OPTIONAL,      -- 0=unknown
+
+    time              TimeHM
+
+}
+--里程表数据
+OdometerData ::= SEQUENCE
+
+{
+		--假如 里程表有米的分辨率则为True
+    meterResolution     BOOLEAN,                 -- TRUE if odometer has meter resolution, FALSE otherwise
+		--里程数 米,无效为2147483647
+    odometerValueMtr    INTEGER (0..2147483647)  -- Odometer reading in meters, 2147483647=invalid
+
+}
+
+TheftAlarmStatus ::= ENUMERATED
+
+{
+
+    no-alarm-info (0),
+
+    alarm-off (1),
+
+    alarm-armed (2),
+
+    alarm-trig (3),
+
+    alarm-trig-mms (4),
+
+    alarm-trig-is (5),
+
+    sensor-fault (7)
+
+}
+
+
+
+
+FuelStatus ::= ENUMERATED
+
+{
+
+    no-fuel-info (0),
+
+    fuel-empty (1),
+
+    fuel-reserve (2),
+
+    fuel-1-4 (3),
+
+    fuel-1-2 (4),
+
+    fuel-3-4 (5),
+
+    fuel-1-1 (6)
+
+}
+-- (0..7)
+
+
+
+--主电池状态
+MainBatteryStatus ::= ENUMERATED
+
+{
+	-- 无电池信息
+    no-battery-info (0),
+	-- 电池电量耗尽
+    battery-empty (1),
+	-- 电池电量低
+    battery-low (2),
+
+    battery-1-4 (3),
+
+    battery-1-2 (4),
+
+    battery-3-4 (5),
+
+    battery-1-1 (6)
+
+}
+-- (0..7)
+
+
+
+--SRS 状态(WOW的音效增加系统)
+SRSStatus ::= ENUMERATED
+
+{
+	-- 无SRS-信息
+    no-srs-info      (0),
+	-- 未部署 SRS
+    srs-not-deployed (1),
+	-- 已部署 SRS
+    srs-deployed     (2)
+
+}
+-- (0..7)
+
+WindowStatuses ::= SEQUENCE
+
+{
+
+    front-left       WindowStatus,
+
+    front-right      WindowStatus,
+
+    rear-left        WindowStatus,
+
+    rear-right       WindowStatus
+
+}
+
+WindowStatus ::= ENUMERATED
+
+{
+
+    open             (1),
+
+    closed           (2),
+
+    unknown          (7)
+
+} 
+--(0..7)
+
+
+
+
+
+
+
+DoorStatuses ::= SEQUENCE
+
+{
+
+  allDoorsLocked BOOLEXT,
+
+  trunkLocked    BOOLEXT,
+
+  doorStatus     IndividualDoorStatuses OPTIONAL
+
+}
+
+
+
+
+IndividualDoorStatuses ::= SEQUENCE
+
+{
+
+    front-left       DoorStatus,
+
+    front-right      DoorStatus,
+
+    rear-left        DoorStatus,
+
+    rear-right       DoorStatus,
+
+    tailgate         DoorStatus,
+
+    engineHood       DoorStatus
+
+}
+
+
+
+
+DoorStatus ::= SEQUENCE {
+
+   doorStatus DoorPosition,
+
+   lockStatus DoorLockStatus
+
+}
+
+
+
+
+DoorPosition ::= ENUMERATED
+
+{
+
+    open             (0),
+
+    closed           (1),
+
+    unknown          (7)
+
+} 
+--(0..7)
+
+
+
+
+DoorLockStatus ::= ENUMERATED {
+
+  unknown          (0),
+
+  unlocked          (1), -- door is not locked	
+
+  locked          (3), -- door is locked
+
+  secured          (4)  -- door is locked form inside and outside
+
+} 
+--(0..7)
+
+
+
+
+
+
+
+
+
+
+TyreStatuses ::= SEQUENCE
+
+--Combined status for all four wheels
+
+{
+
+    front-left       TyreStatus,
+
+    front-right      TyreStatus,
+
+    rear-left        TyreStatus,
+
+    rear-right       TyreStatus
+
+}
+
+
+
+
+TyreStatus ::= SEQUENCE
+
+--Status for a single wheel
+--对于单个车轮状态
+{
+		-- 警告类型
+    warning          TyrePressureWarning,
+		--压力 /hpa
+    pressureHpa      INTEGER (0..32767)     -- Hpa 32767=invalid
+
+}
+
+
+
+
+TyrePressureWarning ::= ENUMERATED
+
+{
+
+    system-fault     (0),
+
+    normal           (1),
+
+    high             (2),
+	--低软警告
+    low-soft-warn    (3),
+	--低硬警告
+    low-hard-warn    (4),
+	--无传感器
+    no-sensors       (5),
+
+    unknown          (7)
+
+} 
+--(0..7)
+
+
+
+
+--Average fuel consumption in centilitres per 10km
+
+AvgFuelConsumptionCl ::= INTEGER (0..16383)      
+
+
+
+
+DashboardStatus ::= SEQUENCE
+
+{
+
+    -- RSOD, This variable should be removed
+
+    dummyForCompiling BOOLEAN
+
+}
+
+
+
+
+EcoGrade ::= SEQUENCE
+
+{
+
+    propulsion  INTEGER(0..101),   -- 0-100%, >100=invalid
+
+    braking     INTEGER(0..101)    -- 0-100%, >100=invalid
+
+}
+
+
+
+
+ServiceWarningStatus ::= ENUMERATED
+
+{
+
+    normal                (0),
+
+    almost-time-for-srvc  (1),
+
+    time-for-srvc         (2),
+
+    time-exceeded         (3),
+
+    unknown               (7)
+
+} 
+--(0..7)
+
+
+
+
+
+
+
+ServiceWarningTrigger ::= ENUMERATED
+
+{
+
+    calendar-time    (0),
+
+    distance         (1),
+
+    engine-hours     (2),
+
+    engine-req       (3),
+
+    unknown          (7)
+
+}
+-- (0..7)
+
+
+
+
+
+
+
+Bulb ::= ENUMERATED
+
+{
+
+    left-turn-any             (0),
+
+    right-turn-any            (1),
+
+    low-beam-any              (2),
+
+    low-beam-left             (3),
+
+    low-beam-right            (4),
+
+    high-beam-any             (5),
+
+    high-beam-left            (6),
+
+    high-beam-right           (7),
+
+    fog-front-any             (8),
+
+    fog-rear-any              (9),
+
+    stop-any                  (10),
+
+    position-any              (11),
+
+    day-running-any           (12),
+
+    trailer-turn-any          (13),
+
+    trailer-turn-left-any     (14),
+
+    trailer-turn-right-any    (15),
+
+    trailer-stop-any          (16),
+
+    trailer-el-failure        (17),
+
+    multiple                  (31)
+
+} 
+--(0..31)
+
+
+
+
+
+
+
+LiquidLevelWarning ::= ENUMERATED
+
+-- Not all values are possible for all types of fluid.
+
+-- Washer:normal/low only ; oil: all but 'very-high'
+
+--   ; coolent/brake: normal/low/high
+
+{
+
+    normal           (0),
+
+    low              (1),
+
+    very-low         (2),
+
+    high             (3),
+
+    very-high        (4),
+
+    unknown          (7)
+
+} 
+--(0..7)
+
+
+
+
+
+
+
+PressureWarning ::= ENUMERATED
+
+{
+
+    normal           (0),
+
+    low              (1),
+
+    unknown          (7)
+
+} 
+--(0..7)
+
+
+
+
+--Status for electrical or hybrid vehicle. 		Currently not used
+--电动车状态
+ElectricVehicleStatus ::= SEQUENCE
+
+{
+
+   chargingProfile    UTF8String (SIZE(0..127)) OPTIONAL,
+
+   isPreconditioning  BOOLEXT,
+
+   isCharging         BOOLEXT,
+
+   isPluggedIn        BOOLEXT,
+
+   distanceToEmptyKm  INTEGER (0..16383) OPTIONAL,
+
+   stateOfCharge      INTEGER (0..100) OPTIONAL,
+
+   timeToFullyChargedHrsx4 INTEGER (0..127) OPTIONAL,
+
+   chargeType         ChargeType OPTIONAL
+
+}
+
+
+
+
+ChargeType ::= ENUMERATED
+
+{
+
+   unknown       (0),
+
+   charge-110v   (1),
+
+   charge-240v   (2),
+
+   charge-level3 (3)
+
+} 
+--(0..7)
+
+
+
+
+
+
+
+TelematicUnitStatus ::= SEQUENCE
+
+{
+
+   power                     TUPowerSource OPTIONAL,
+
+   diagnostics               TUDiagnosticData OPTIONAL,
+
+   battery               TUBackupBatteryStatus OPTIONAL, 
+
+   mobilePhoneConnected      BOOLEXT, --Always �unused?
+   sleepCyclesStartTime      TimeStamp OPTIONAL, --2000-01-01-00-00-00 - no info
+
+   configVersion             TuConfigVersion,
+
+   activation                TuActivationStatus,
+
+   usesExternalGnss          BOOLEXT, --Whether TU uses a built-in GNSS receiver
+
+
+
+
+   --Only included in healthcheck response msgs
+
+   hwVersion                 PrintableString (SIZE (20)) OPTIONAL,
+
+   swVersionMain             PrintableString (SIZE (20)) OPTIONAL,
+
+   swVersionSecondary        PrintableString (SIZE (20)) OPTIONAL,
+
+   swVersionConfiguration    PrintableString (SIZE (20)) OPTIONAL,
+
+   serialNumber              PrintableString (SIZE (20)) OPTIONAL,
+
+   ...
+
+}
+
+
+
+
+
+
+
+TUPowerSource ::= ENUMERATED
+
+{
+		--主电池
+    mainBattery (0),
+		--- 非充电电池
+    reserveBatteryPrimary (1),  --non-rechargeable cell
+		--充电电池
+    reserveBatterySecondary (2)   --rechargeable cell
+
+} 
+--(0..7)
+
+
+
+
+TUDiagnosticData ::= SEQUENCE
+
+{
+
+    speaker            TUDiagnostic,
+	--麦克风
+    mic                TUDiagnostic,
+
+    extHandsfree       TUDiagnostic,
+
+    handset            TUDiagnostic,
+
+    gsmModem           TUDiagnostic,
+
+    gsmExtAntenna      TUDiagnostic,
+
+    extPower           TUDiagnostic,
+
+    intPower           TUDiagnostic,
+
+    gnss               TUDiagnostic,
+
+    gnssAntenna        TUDiagnostic,
+
+    can                TUDiagnostic,
+
+    buttons            TUDiagnostic,
+
+    crashInput         TUDiagnostic,
+
+    intRtc             TUDiagnostic,
+
+    --Only included in healthcheck msgs:
+
+    troubleCodes       SEQUENCE SIZE(0..63) OF DiagnosticTroubleCode OPTIONAL,
+
+    daysSinceGnssFix   INTEGER(0..255), --Number of days passed since last known GNSS fix. 0=fix received today, 254= 254 or more,  255=unknown.
+
+    ...
+
+}
+
+
+
+
+
+
+
+TUDiagnostic ::= ENUMERATED
+
+{
+
+    broken (0),
+
+    uncertain (1),
+
+    functioning (3)
+
+}
+-- (0..3)
+
+
+
+
+
+
+
+--Status of internal backup batteries, supports one primary cell (non-rechargeable) 
+
+--and one secondary cell (rechargeable)
+
+
+
+-- 内部备用电池状态，支持一个一次电池（不可充电
+TUBackupBatteryStatus ::= SEQUENCE
+
+{   
+	--初次电压 伏*x10
+   primaryVoltx10       INTEGER(0..63)  OPTIONAL,
+
+   primaryChargePerc    INTEGER(0..100) OPTIONAL,
+	--二次电压
+   secondaryVoltx10     INTEGER(0..63)  OPTIONAL,
+
+   secondaryChargePerc  INTEGER(0..100) OPTIONAL,
+
+...
+
+}
+
+
+
+
+--Version of the country-specific provisioning database. This version is set by the TSP to a value > 0.Thus the value 0 indicates that it has not been set.
+--特定国家配置数据库的版本。这个版本是由TSP设置为一个值>0.Thus值0指示它没有被设置。
+TuConfigVersion ::= INTEGER(0..65535)
+
+
+
+
+
+
+
+TuActivationStatus ::= ENUMERATED
+
+{
+
+--factory: used until a diagnostic routine to go to preactivated mode is used in OEM factory. Modem active when unit is kept alive by CAN.
+
+   factory                  (0), -- not used
+
+--preactivated: Modem active as above. (This mode is used during Factory Test.)
+
+   preactivated             (1),
+
+--preactivated-logistics: Entered from preactivated by diagnostic routine. Not used on all markets. Modem active as above.
+
+   preactivated-logistics   (2), --not used
+
+--Power management as in provisioned mode, but services not active. Can be set by TSP (causes �factory reset?. This state is also entered after factory reset if caused by other reason (SIM id switch in Brazil). 
+
+   activated                (7), 
+
+   activated-eCall          (8), --not used
+
+   activated-Brazil         (9), --not used
+
+--provisioned: Unit has a been set to provisioned state by TSP. Services active as specified per service. Listen mode + wake-up cycles when parked (as configured).
+
+   provisioned              (12), 
+
+--deactivated: Service activation is not allowed.
+
+   deactivated              (15) 
+
+}
+
+-- (0..15)
+
+
+
+
+DiagnosticTroubleCode ::= SEQUENCE {
+
+   --Node ID which will be OEM specific
+
+   node      CHOICE {telematicUnit    NULL, id   INTEGER (0..65535)},
+
+   --ID of the trouble code. OEM specific
+
+   dtcId       INTEGER (0.. 4294967295),
+
+   --status of the DTC. Follows ISO 14229
+	--DTC 状态 依照 ISO 14229
+   status      DtcStatusBitsIso14229,
+
+   --Failure counter.
+
+   failureCount     INTEGER (0..255) OPTIONAL,
+
+   --Time of last failure
+   --最后一次故障时间
+   lastFail          TimeStamp OPTIONAL,
+
+   ...
+
+}
+
+
+
+
+DtcStatusBitsIso14229 ::= BIT STRING {
+
+  testFailed (0),
+
+  testFailedThisOperationCycle (1),
+
+  pendingDTC (2),
+
+  confirmedDTC (3),
+
+  testNotCompletedSinceLastClear (4),
+
+  testFailedSinceLastClear (5),
+
+  testNotCompletedThisOperationCycle (6),
+
+  warningIndicatorRequested (7)
+
+}
+
+
+
+--车辆燃料类型
+VehiclePropulsionType ::= SEQUENCE {
+		--目前为汽油燃料
+  gasolineTankPresent        BOOLEXT,
+		--目前为柴油燃料
+  dieselTankPresent          BOOLEXT,
+		--目前为液化气燃料
+  liquidgasTankPresent       BOOLEXT,
+		--目前为好电能
+  highElectricEnergyPresent  BOOLEXT, -- more than 42V and 100Ah
+		--目前为氢气燃料
+  hydrogenTankPresent        BOOLEXT,
+		--目前为天然气燃料
+  naturalGasTankPresent      BOOLEXT,
+
+  ...
+
+}
+
+
+
+
+CrashInformation ::= SEQUENCE {
+--碰撞数据 511个字节
+  data           OCTET STRING (SIZE(0..511)) OPTIONAL,
+--乘客数量
+  passengers            INTEGER(0..15) OPTIONAL,
+--严重程度
+  severity              INTEGER(0..15) OPTIONAL,
+--碰撞类型
+  type                  SEQUENCE {
+		--正面碰撞
+     frontCrash         BOOLEXT,
+		--后面碰撞
+     rearCrash          BOOLEXT,
+		--侧面碰撞
+     sideCrash          BOOLEXT,
+		--侧翻
+     rollover           BOOLEXT
+
+     } OPTIONAL,
+
+  
+
+  ...
+
+}
+
+
+
+
+  
+
+GenericText ::= SEQUENCE {
+
+  text UTF8String (SIZE(0..65535))
+
+}
+
+
+
+
+GenericParameter ::= SEQUENCE
+
+{
+
+  key   GenericParameterKey,
+
+  value GenericParameterValue
+
+}
+
+
+
+
+
+
+--参数的KEY 
+GenericParameterKey ::= CHOICE {
+
+   name   PrintableString (SIZE(0..63)),  --Not used in current TU implementation
+
+   id     INTEGER(0..4294967295)
+
+}
+
+GenericParameterValue ::= CHOICE
+
+{
+
+  --The group below is called �Short Generic Parameters? Currently TCU supports read/set of max 10 �Short Generic Parameters?in one message.
+
+  noval         [0]   NULL, --Use?
+
+  read          [1]   NULL, --Command to TU to return the current value
+
+  resetToDefault [2]  NULL, --Command to TU to reset the parameter to its default value
+
+  uint8Val      [10]   INTEGER (0..255),
+
+  uint16Val     [11]   INTEGER (0..65535),
+
+  uint32Val     [12]   INTEGER (0..4294967295),
+
+  boolVal        [13]  BOOLEAN,
+
+
+
+
+  --The group below is called �Long Generic Parameters?. Currently TCU supports read/set of max 2 �Long Generic Parameters?in one message.
+
+  dataVal        [30]  OCTET STRING (SIZE(0..65535)),
+
+  dataValShort   [31]  OCTET STRING (SIZE(0..31)),
+
+  stringVal      [32]  UTF8String (SIZE(0..65535)),
+
+  stringValShort [33]  UTF8String (SIZE(0..31)),
+
+  
+
+  
+
+  
+
+  timestamp     [40]   TimeStamp,
+
+  poi           [41]   PointOfInterest,  --Not supported
+
+  point         [42]   BasicPosition,    --Not supported
+
+  position      [43]   FullPosition,     --Not supported
+
+  positions     [44]   SEQUENCE SIZE (1..32) OF FullPosition, --Not supported
+
+  trackPoint    [45]   TrackPoint,
+
+
+
+
+  --Return codes from TU, instead of sending the parameter value
+
+   setOk                 [50]    NULL,             --Parameter successfully set
+
+   failedNotAllowed      [51]    NULL,             --TSP tried to set a readonly parameter or read a protected parameter.
+
+   setFailedWrongType    [52]    NULL,             --TSP tried to set e.g. a boolean parameter to a string value
+
+   setFailedValueOutOfRange [53] NULL,             --TSP tried to set a value outside the accepted range.
+
+   failedKeyNotSupported    [54] NULL             --TSP supplied an invalid/unsupported key
+
+   
+
+} 
+
+--(0..63)
+
+
+
+
+
+
+
+TimeStamp ::= SEQUENCE {
+
+  seconds INTEGER(0..2147483647)    -- UTC seconds since January 1st, 2000, 00:00 (31 Bit)
+
+}
+
+
+
+
+
+
+
+BasicPosition ::= SEQUENCE {        
+
+  -- format: milliarcsecond = degree / 3600000
+
+  latitude  INTEGER(-2147483648..2147483647), -- 32 bits
+
+  longitude INTEGER(-2147483648..2147483647)  -- 32 bits
+
+}
+
+
+
+
+-- ASN PARSER BUG, DOES NOT UNDERSTAND VALUE ASSIGNMENT.
+
+-- The below is only so that it doesn�t complain about it.
+
+S32-SizeConstrainedInteger ::= INTEGER(-2147483648..2147483647)  -- 32 bits
+
+latitudeUnknown  S32-SizeConstrainedInteger::= 324000001
+
+longitudeUnknown S32-SizeConstrainedInteger::= 648000001
+
+-- LatitudeUnknown ::= INTEGER=324000001
+
+-- LongitudeUnknown ::= INTEGER=648000001
+
+
+
+
+
+
+
+
+
+
+-- Maximum value Latitude = 90?00'00.000'' 
+
+-- = 90*60*60.000'' = 324000,000'' 
+
+-- = 324 000 000 Milliarcseconds
+
+-- = 0x134FD900
+
+-- Minimum value Latitude = -90?00'00.000'' 
+
+-- = -90*60*60.000'' = -324000.000'' 
+
+-- = -324 000 000 Milliarcseconds
+
+-- = 0xECB02700 
+
+-- Lat. unknown value 324 000 001 (0x134FD901)
+
+
+
+
+-- Maximum value Longitude = 180?00'00.000'' 
+
+-- = 180*60*60.000'' = 648000.000'' 
+
+-- = 648 000 000 Milliarcseconds
+
+-- = 0x269FB200
+
+-- Minimum value Longitude = -180?00'00.000'' 
+
+-- = -180*60*60.000'' = -648000.000'' 
+
+-- = -648 000 000 Milliarcseconds
+
+-- = 0xD9604E00 
+
+-- Long. unknown value 648 000 001 (0x269FB201)
+
+
+
+
+BOOLEXT ::= ENUMERATED {
+
+  isFalse    (0),
+
+  isTrue     (1),
+
+  isUnused   (2),
+
+  isUnknown  (3)
+
+}
+
+
+
+
+
+Acknowledge ::= ENUMERATED {
+
+  nack      (0),
+
+  ack       (1)
+
+}
+
+
+
+
+VIN ::= SEQUENCE {
+
+ isowmi PrintableString (SIZE(3)) OPTIONAL, -- for long VIN	
+
+ isovds PrintableString (SIZE(6)) OPTIONAL, -- for long VIN
+
+ isovisModelyear PrintableString (SIZE(1)) OPTIONAL, -- for model year iso VIS 
+
+ isovisSeqPlant PrintableString (SIZE(7)) -- Mandatory 7-digit VIN (plant code +  sequential number)
+
+}
+
+
+
+
+
+
+
+--Triggers that can be used by different applications
+-- 触发器,可用于不同的业务
+TriggerType::= ENUMERATED {
+
+
+
+
+  --eCall
+
+  eCallButton,
+
+  crashModuleWireInput,
+
+  crashModuleCanInput,
+
+  
+
+
+
+
+  --bCall
+
+  bCallButton,
+
+
+
+
+  --TrackPoint triggers
+
+  engineOn,
+
+  engineOff,
+
+  firstFix,
+
+  drivenDistanceSinceLastTp,
+
+  timeSinceLastTp,
+
+  turnAngleSinceLastTp,
+
+  firstNwReg,
+
+  
+
+  --WayPoint triggers
+
+  drivenDistanceSinceLastWp,
+
+  timeSinceLastWp,
+
+  turnAngleSinceLastWp,
+
+
+
+
+  -- Status update triggers
+
+  lowFuelLevel,
+
+  transitionRemoteEngineStartToNormal,
+
+  remoteEngineStartRunTimeExpiry,
+
+  remoteEngineStartFailure,
+
+  remoteEngineStopFailure,
+
+  vehicleCommunicationFailed,
+
+  userInterruption,
+
+  --Generic
+
+  tspReq,
+
+  diagRoutine
+
+}
+
+--(0..255)
+
+
+
+
+--Carries data for a single alert
+-- 包含数据的单个报警信息
+AlertType ::= SEQUENCE {
+
+
+
+
+  --Alert timestamp.
+  -- 报警的时间
+
+  time         TimeStamp,
+
+
+
+
+  --Cause and data
+  --详细信息
+
+  alertData    AlertData,
+
+
+
+
+  --Set to false if this is an indication that the alert is no longer active
+  -- 假如为False 那么表明这是一个迹象,在这之后告警不在有效
+  alertActive  BOOLEAN
+
+}
+
+
+
+
+--Define different alerts including supporting data
+-- 定义了不同的告警,并包含支持数据
+AlertData ::= CHOICE {
+
+  engineOn             [0]   NULL,
+
+
+
+
+  --Theft Notification alerts
+	--车辆告警
+  vehicleAlarm         [10]  NULL, --also used by RVS
+	--外部断电
+  externalPowerRemoval [11]  NULL,
+	--GSM干扰
+  gsmJamming           [12]  NULL,
+	--GSM天线故障
+  gsmAntennaFailure    [13]  NULL,
+	--gnss天线故障
+  gnssAntennaFailure   [14]  NULL,
+	--未授权移动
+  unauthMovement       [15]  NULL,
+
+
+
+
+  --RVS alerts
+	--冷却液水位
+  coolantLevel         [30]  NULL,
+
+  unused               [31]  NULL, --?
+	--清洗器液位(玻璃水水位?)
+  washerFluidLevel     [32]  NULL,
+	--制动液状态
+  brakeFluidStatus     [33]  NULL,
+	--刹车片磨损
+  brakePadWear         [34]  NULL,
+	--轮胎压力 前左
+  tyrePressureFL       [35]  TyreStatus,
+	--轮胎压力 前右
+  tyrePressureFR       [36]  TyreStatus,
+	--轮胎压力 后左
+  tyrePressureRL       [37]  TyreStatus,
+	--轮胎压力 后右
+  tyrePressureRR       [38]  TyreStatus,
+	--轮胎传感器故障
+  tyrePressSensorFail  [39]  NULL,
+	--发动机故障
+  engineMalfunction    [40]  NULL,
+	--油位
+  oilLevel             [41]  LiquidLevelWarning,
+
+  distToServiceKm      [42]  NULL,
+	--超出里程表
+  odometerExceeded     [43]  OdometerData, -- RSOD, changed from Value to Data
+
+  transportMode        [44]  NULL,
+	--低电池电压 (x10)
+  lowBatteryVoltx10    [45]  INTEGER(0..127),  --battery voltage *10
+	--燃油液位
+  fuelLevel            [46]  NULL, 
+	--燃料余量(单位升)
+  fuelLevelLtrs        [47]  INTEGER(0..127),  --Amount in litres. 
+	--远程气候
+  remoteClimate        [48]  NULL,  -- Indicates if remoteClimate is active or not
+	--	车辆锁定
+  vehicleUnlocked      [50]  NULL, --�delayed?alert
+	-- 车门打开
+  doorOpen             [51]  NULL, --�delayed?alert
+	--车辆启动
+  bootOpen             [52]  NULL, --�delayed?alert
+	-- 引擎盖打开
+  bonnetOpen           [53]  NULL, --�delayed?alert
+	--车顶打开 (当前未启用)
+  roofOpen             [54]  NULL, --�delayed?alert   Currently not used
+	--窗口打开
+  windowOpen           [55]  NULL, --�delayed?alert
+
+  alarmUnarmed         [56]  NULL  --�delayed?alert
+
+}
+
+--(0..255)
+
+
+
+
+MSDInformation ::= SEQUENCE {
+
+   messageIdentifier      INTEGER(0..4294967295),
+
+   --automaticActivation skipped, can be derived from the trigger
+
+   --testCall  skipped, use the generic testFlag
+
+   --positionTrusted skipped, can be derived from the fix type
+
+   --vehicleType skipped, known by TSP
+
+   --vin skipped - part of header
+
+   --propulsion skipped, known by TSP
+
+   --timestamp skipped, included by Event Timestamp
+
+   --Vehicle position data skipped, part of PearlChain
+
+   --no of passengers skipped, part of CrashInformationA
+
+
+
+
+   ...
+
+}
+
+
+
+
+JourneySummary ::= CHOICE {
+		--通用数据之旅
+  type1     [0] JourneySummary1, --Generic trip data
+
+  type2     [1] JourneySummary2, --Data for the just finished trip
+
+  type2A    [2] JourneySummary2, --Data since last time user resetted trip computer (TBC)
+
+  type2B    [3] JourneySummary2  --Data since last fuel-up (TBC)
+
+}
+
+--(0..15)
+
+
+
+
+--Data for one journey, collected by the TU. Contains start and stop data and fuel consumption.
+
+JourneySummary1 ::= SEQUENCE {
+
+    journeyId       CollectionId,
+
+  startTrigger    TriggerType,
+
+  startTime       TimeStamp,
+
+  startOdometer   OdometerData,
+
+  firstPosition   BasicPosition,
+
+  --Distance driven between start and first position 4095 = 4095 or more
+
+  firstPosDist    INTEGER (0..4095), 
+
+  endTrigger      TriggerType,
+
+  endTime         TimeStamp,
+
+  endOdometer     OdometerData,
+
+  endPosition     BasicPosition,
+
+  avgFuelConsCl  AvgFuelConsumptionCl OPTIONAL, -- Not currently used
+
+  --Note entered by user in the HMI, if available
+
+  userNote        OCTET STRING (SIZE(0..63))  , -- not currently used
+
+  tripType        TripType OPTIONAL, -- trip type assigned by user, not currently used
+
+  ...
+
+}
+
+TripType ::= ENUMERATED {
+
+   private   (0),
+
+   business  (1)
+
+  
+
+}
+
+-- (0..15)
+
+--Data for one journey, based on received CAN signals
+
+JourneySummary2 ::= SEQUENCE {
+
+  
+
+  journeyId            CollectionId OPTIONAL, --omitted if unknown or if a JourneySummary1 is also sent
+
+  -- Indicates the units used for the data fields
+
+  dashboardUnits        DashboardUnits,
+
+  --Average fuel consumption in the unit shown on the dashboard.
+
+  -- Note: Named fuel economy?in some specs
+
+  --0-999 consumption * 10, 1000=unknown, 1001=initialization, 1002-1023 Reserved
+
+  avgFuelConsx10       INTEGER(0..1023), 
+
+
+
+
+  --Trip distance in the unit shown on the dashboard
+
+  --0-16777214=dashboard value * 10, 16777215=unknown
+
+  distancex10          INTEGER(0..16777215), 
+
+
+
+
+  --Average speed in the unit shown on the dashboard
+
+  --0-500=dashboard value, 510=unknown, 511=initialization
+
+  avgSpd               INTEGER(0..511), 
+
+  
+
+  --Period for which ECO Start/Stop was active
+
+  -- 0-16777214=value (unit?),  16777215=unknown
+
+  ecoStopTimer         INTEGER(0.. 16777215), 
+
+
+
+
+  --Hybrid vehicle data
+
+  --Percentage of time the engine was off
+
+  --0-100=percentage, 101=Unknown, 102=Initialisation, 103-127=Invalid
+
+  engineOffPerc        INTEGER(0..127)  OPTIONAL,  --hybrid vehicles only  
+
+  --Percentage of ?
+
+  electricAssistPerc   INTEGER(0..127)  OPTIONAL,  --hybrid vehicles only. Currently this parameter will never be included or will not contain valid values (Can signals missing).
+
+  -- Energy Recovered by hybrid module in terms of distance. 
+
+  -- 0-16777214=value*10, 16777215=unknown
+
+  energyRecoveredx10      INTEGER(0.. 16777215) OPTIONAL,  --hybrid vehicles only
+
+
+
+
+  --Eco scores. 
+
+  --0-9=invalid, 10-50=score*10, 51=unknown 52=initialization 53-63=invalid
+
+  throttleEcoScorex10   INTEGER(0..63),   
+
+  speedEcoScorex10     INTEGER(0..63),   
+
+  brakeEcoScorex10     INTEGER(0..63),
+
+  totalEcoScorex10     INTEGER(0..63),
+
+  startTime TimeStamp OPTIONAL, --Start time or trip reset time
+
+  ...
+
+}
+
+
+
+
+DashboardUnits ::= ENUMERATED {
+   milespergallon,
+   milesperhour,
+   milesperliter,
+   kmperliter,	
+   literper100km,
+   unknown
+ }
+
+DebugInfo ::= SEQUENCE {
+
+   id    UTF8String(SIZE(0..65535)),
+
+   value INTEGER(0..255)
+
+  }
+
+
+
+
+--A list of more or less generic error codes. Each service must describe if and when error codes are used.
+
+ErrorCode ::= CHOICE {
+	--消息顺序不正确 消息到达顺序在那里无法处理的
+   incorrectSequence    [0]  NULL,   -- Message arrived out of sequence where it could not be processed. See also noOngoingService below.
+	--ETC不正确 这个Tu应用已经处理了不同的EventCreationTime
+   incorrectEct         [1]  NULL,   --TU application is already processing an event with a different EventCreationTime
+	--状态不正确 
+   incorrectState       [2]  NULL,   --The TU internal state prevented the message from being processed
+
+   notAllowed           [3]  NULL,   --The TU is not allowed to process the request. This could happen if TSP is not following the specification or because of legislative reasons in a particular area.
+	--数据校验错误
+   invalidData           [4] NULL,  --Data received could not be interpreted.
+	--数据格式错误
+   invalidFormat         [5] NULL,  -- The format of received data was not accepted.
+	--没有内存可以处理数据
+   outOfMemory           [6] INTEGER (0..65535),  --The message is too large to be processed or there is not enough space to store the content, e.g. if the country database is full. The supplied data is defined per application.
+	--没有持续的服务
+   noOngoingService      [7] NULL,  --A special case of �incorrectSequence? where the service is currently idle. Used when a request which is not a start request arrives to an idling service.
+	--当前车辆行动模式无法执行指令
+   vehiclePowerModeNotCorrect [8] NULL,  --The request was not allowed to be processed due to the vehicle power mode.
+	--执行的条件不正确,在没有其他更具体的错误时 使用此错误
+   conditionsNotCorrect  [9] NULL,  --The conditions for executing the request was not correct (and no other more specific error code exist).
+	--执行失败
+   executionFailure      [10] NULL,  --The execution of the request failed. More detailed information about the execution failure can be added to genericError.
+	--油面过低
+  fuelLevelTooLow        [11] NULL,
+	--电池电量太低
+  batteryLevelTooLow     [12] NULL,
+
+  runTimeExpiry          [13] NULL,
+	--盗窃事件
+  theftEvent             [14] NULL,
+	--撞车事件
+  crashEvent             [15] NULL,
+	--超时
+  timeout                [16] NULL,
+	--车窗未关
+  windowNotClosed        [17] NULL,
+	--有危险警告
+  hazardWarningOn        [18] NULL,
+	--车辆未锁
+  vehicleNotLocked       [19] NULL,
+	--主动报警
+  alarmActive            [20] NULL,
+	--按下刹车踏板
+  brakePedalPressed      [21] NULL,
+	--车辆不固定
+  vehicleNotStationary   [22] NULL,
+
+  transmissionNotInPark  [23] NULL,  climateModeNotCorrect  [24] NULL,
+
+  genericError         [255]  PrintableString (SIZE(1..63))
+
+
+
+
+}
+-- (0..255)
+
+
+
+
+END
+
+

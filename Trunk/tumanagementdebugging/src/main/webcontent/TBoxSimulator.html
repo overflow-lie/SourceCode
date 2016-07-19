@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>TBox模拟器</title>
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css"
+	media="screen" />
+<link href="css/style.css" rel="stylesheet" type="text/css"
+	media="screen" />
+<link rel="stylesheet" href="css/jquery.bigautocomplete.css"
+	type="text/css" />
+<script src="js/jquery-1.8.3.min.js" type="text/javascript"></script>
+<script src="js/bootstrap.min.js" type="text/javascript"></script>
+<script src="js/top.js" type="text/javascript"></script>
+<script src="js/common.js" type="text/javascript"></script>
+<script type="text/javascript">
+	//配置 id数组
+	var inputId = new Array();
+
+	inputId[0] = "#ip";
+	inputId[1] = "#port";
+	inputId[2] = "#bid";
+	
+	var lastShowIndex = 0;
+	//用于区分当前用户 是否有权限更新TBoxLog 的lastShowIndex
+	var firstLoad = false;
+	$(function() {
+		firstLoad = true;
+		checkOtherConfig();
+		hidePrompt();
+		validateStatus();
+		$("#otherConfig").click(function() {
+			$(".otherConfig").toggle();
+		});
+		/* $("#taskoffBtn").hide(); */
+		$("#taskbenBtn").click(function() {
+			$("#panel_table").find("tbody").find("tr").remove();
+			starttask();
+		});
+		$("#taskoffBtn").click(function() {
+			offtask();
+		});
+	});
+	var checkOtherConfig = function() {
+		if (!$("#otherConfig").is(':checked')) {
+			$(".otherConfig").hide();
+		}
+	}
+	var num = $("#num").val();
+	var offset = $("#offset").val();
+
+	var lastsize = 0;
+	var starttask = function() {
+		firstLoad = false;
+		hidePrompt();
+		checkOtherConfig();
+		timeout = false;
+		var url = "zotyeSimulator/v2/start";
+		var data = {
+			ip : $("#ip").val(),
+			port : $("#port").val(),
+			bid : $("#bid").val()
+		};
+		if ($("#otherConfig").is(':checked')) {
+			data = {
+				ip : $("#ip").val(),
+				port : $("#port").val(),
+				bid : $("#bid").val()
+			};
+		}
+		$.ajax({
+			url : url,
+			type : "POST",
+			dataType : "json",
+			data : data,
+			error : function(request, textStatus, errorThrown) {
+				$("#errorPrompt").text("启动失败！");
+				$(".alert-danger").show();
+			},
+			success : function(data) {
+			/* 	$("#panel_table").find("tbody").find("tr").remove(); */
+				master = true;
+				$("#taskbenBtn").attr({
+					"disabled" : "disabled"
+				});
+				inputDisable(inputId);
+				var params = {
+		    		lastShowIndex : $("#lastShowIndex").val(),
+			    };
+				time(params);
+			}
+		})
+	}
+	var timeout = false;
+
+	var time = function(data) {
+		if (timeout)
+			return;
+		getLogs(data);
+		setTimeout(time, 1000);
+	}
+	var offtask = function() {
+		hidePrompt();
+		var url = "zotyeSimulator/v2/stop";
+		$.ajax({
+			url : url,
+			type : "POST",
+			dataType : "json",
+			data : {
+				ip : $("#ip").val(),
+				port : $("#port").val(),
+				bid : $("#bid").val()
+			},
+			error : function(request, textStatus, errorThrown) {
+				timeout = false;
+				$("#errorPrompt").text("关闭失败！");
+				$(".alert-danger").show();
+			},
+			success : function(data) {
+				timeout = true;
+				$("#taskbenBtn").removeAttr("disabled");
+				inputRemoveDisble(inputId);
+				$("#successPrompt").text("关闭成功！");
+				$(".alert-success").show();
+			}
+		})
+	}
+	var showlogs = function(data) {
+		var logs = data['logs'] || [];
+		var index = 0;
+		$.each(logs, function(i, value) {
+			if (value != null) {
+				var Datetemp = new Date(value.createTime);
+				var tb = document.getElementById("panel_table");
+				var newTr = tb.insertRow(1);
+				var newTd1 = newTr.insertCell();
+				newTd1.innerHTML = value.index;
+				
+				var newTd2 = newTr.insertCell();
+				newTd2.innerHTML = Datetemp.format("yyyy-MM-dd hh:mm:ss");
+				
+				var newTd3 = newTr.insertCell();
+				newTd3.innerHTML = value.logLevel;
+				
+				var newTd4 = newTr.insertCell();
+				newTd4.innerHTML = value.msg;
+				index = value.index;
+			}
+		});
+	}
+	
+	var getLogs = function(data) {
+		var url = "zotyeSimulator/v2/log";
+		var params = {
+	    	lastShowIndex : $("#lastShowIndex").val(),
+		};
+		if(firstLoad){
+			params={
+				lastShowIndex : $("#lastShowIndex").val(),
+				num : 20,
+    			firstLoad : firstLoad
+			};
+		}
+		$.ajax({
+			url : url,
+			type : "POST",
+			dataType : "json",
+			data : params,
+			error : function(request, textStatus, errorThrown) {
+				timeout = true;
+			/*  $("#errorPrompt").text("失败！"); $(".alert-danger").show(); */
+				$("#taskbenBtn").removeAttr("disabled");
+				inputRemoveDisble(inputId);
+			},
+			success : function(data) {
+				$("#lastShowIndex").attr("value",data['logs.lastShowIndex']);
+				showlogs(data);
+			}
+		});
+	}
+	// 日期format
+	Date.prototype.format = function(format) {
+		var o = {
+			"M+" : this.getMonth() + 1, // month
+			"d+" : this.getDate(), // day
+			"h+" : this.getHours(), // hour
+			"m+" : this.getMinutes(), // minute
+			"s+" : this.getSeconds(), // second
+			"q+" : Math.floor((this.getMonth() + 3) / 3), // quarter
+			"S" : this.getMilliseconds()
+		}
+
+		if (/(y+)/.test(format)) {
+			format = format.replace(RegExp.$1, (this.getFullYear() + "")
+					.substr(4 - RegExp.$1.length));
+		}
+
+		for ( var k in o) {
+			if (new RegExp("(" + k + ")").test(format)) {
+				format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k]
+						: ("00" + o[k]).substr(("" + o[k]).length));
+			}
+		}
+		return format;
+	}
+
+	//禁用
+	var inputDisable = function(id) {
+		$.each(id, function(i, value) {
+			$("" + value).attr({
+				"disabled" : "disabled"
+			});
+		});
+	}
+	//释放禁用
+	var inputRemoveDisble = function(idList) {
+		$.each(idList, function(i, value) {
+			$("" + value).removeAttr("disabled");
+		});
+	}
+	
+	var validateStatus = function(){
+		var url = "zotyeSimulator/v2/status";
+		$.ajax({
+			url : url,
+			type : "GET",
+			dataType : "json",
+			success : function(data) {
+				var status = data['status'];
+				if (status.ISOPENED) {
+					$("#taskbenBtn").attr({
+						"disabled" : "disabled"
+					});
+					inputDisable(inputId);
+					$("#errorPrompt").text("测试中！");
+					$(".alert-danger").show();
+					$("#ip").attr("value",status.staticConfig.ip);
+					$("#port").attr("value",status.staticConfig.port);
+					$("#bid").attr("value",status.staticConfig.bid);
+				    $("#num").attr("value",20);
+				    $("#lastShowIndex").attr("value",status.lastShowIndex);
+					time(data);
+					firstLoad = false;
+					return true;
+				}
+			}
+		});
+	}
+</script>
+</head>
+<body>
+	<form method="post" action="" id="queryForm">
+		<div style="margin-left: 10px; margin-top: 30px;">
+
+			<div class="alert alert-success alert-dismissable"
+				style="width: 98%;">
+				<button type="button" class="close" data-dismiss="alert"
+					aria-hidden="true">&times;</button>
+				<span id="successPrompt"></span>
+			</div>
+
+			<div class="alert alert-danger alert-dismissable" style="width: 98%;">
+				<button type="button" class="close" data-dismiss="alert"
+					aria-hidden="true">&times;</button>
+				<span id="errorPrompt"></span>
+			</div>
+			<div class="panel panel-default" style="width: 98%;">
+				<div class="panel-heading" style="background-color: #d9edf7;">TBox模拟器</div>
+				<div class="panel-body">
+					<div class="control-group">
+						<span class="required">*</span> <span style="margin-right: 5px;"></span>
+						<span style="margin-right: 20px;">IP</span><input id="ip"
+							class="config" type="text" name="ip" value="172.20.3.110">
+						<span style="margin-right: 20px;">PORT</span><input id="port"
+							class="config" type="text" name="port" value="7979" /> <span
+							style="margin-right: 20px;">BID</span><input id="bid"
+							class="config" type="text" name="bid" value="1231" /> <input
+							type="hidden" id="lastShowIndex" value="0"> <input type="hidden"
+							id="num" value=""> <input type="checkbox"
+							id="otherConfig"><span style="margin-right: 20px;"><label
+							for="otherConfig">其他配置</label></span> <input type="button"
+							name="taskBtn" id="taskbenBtn" value="开始"
+							class="btn btn-info btn-sm"> <input type="button"
+							name="taskBtn" id="taskoffBtn" value="结束"
+							class="btn btn-info btn-sm">
+						<!-- <input type="button" name="taskBtn"  id="configBtn" value="配置" class="btn btn-info btn-sm"> -->
+					</div>
+					<div class="control-group otherConfig">
+						<span style="margin-right: 20px;">operation</span><input
+							id="operation" type="text" name="operation" value="f1"> <span
+							style="margin-right: 20px;">发动机转数</span><input
+							id="engineSpeedRPM" type="text" name="engineSpeedRPM"
+							value="3000"> <span style="margin-right: 20px;">车速</span><input
+							id="vehicleSpeedVSOSig" type="text" name="vehicleSpeedVSOSig"
+							value="42"> <span style="margin-right: 20px;">天窗</span><input
+							type="checkbox" id="scuttleConf"><span
+							style="margin-right: 20px;"><label for="scuttleConf">开/关</label></span>
+
+					</div>
+				</div>
+				<table class="table table-bordered" id="panel_table"
+					style="width: 100%">
+					<thead>
+						<tr>
+							<th width="5%" align="center">Index</th>
+							<th width="5%" align="center">CreateTime</th>
+							<th width="5%" align="center">LogLevel</th>
+							<th width="30%" align="center">MSG</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</form>
+
+
+</body>
+</html>

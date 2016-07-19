@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>详细服务错误日志信息</title>
+
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="css/bootstrap-datetimepicker.css" rel="stylesheet"
+	type="text/css" />
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<link href="js/skins/default.css" rel="stylesheet" type="text/css" />
+<script language="javascript" src="js/jquery-1.8.3.min.js"
+	type="text/javascript"></script>
+<script language="javascript" src="js/bootstrap.min.js"
+	type="text/javascript"></script>
+<script language="javascript" src="js/jquery.cookie.js"
+	type="text/javascript"></script>
+<script language="javascript" src="js/common.js" type="text/javascript"></script>
+<script language="javascript" src="js/bootstrap-datetimepicker.js"
+	charset="UTF-8"></script>
+<script language="javascript" src="js/bootstrap-datetimepicker.zh-CN.js"
+	charset="UTF-8"></script>
+<script language="javascript" src="js/jquery.artDialog.source.js"
+	type="text/javascript"></script>
+<script language="javascript" src="js/iframeTools.source.js"
+	type="text/javascript"></script>
+<script src="js/staticname.js" type="text/javascript"></script>
+<style type="text/css">
+	#serviceSpan{
+		margin-left: -13px;
+	}
+</style>
+<script type="text/javascript">
+$(function() {
+$("#returnMessage").hide();
+	var params = decodeURI(window.location.search);//url参数
+	var arr = params.substring(1).split("&");
+	var vin = arr[0].split("=")[1];//vin
+	var bid = arr[1].split("=")[1];//bid
+	var serviceName = arr[2].split("=")[1];//serviceName
+	var startTime = arr[3].split("=")[1];
+	var endTime = arr[4].split("=")[1];
+	
+	var data = {
+		vin : vin,
+		bid : bid,
+		servicename : serviceName,
+		starttime : startTime,
+		endtime : endTime
+	};
+	loadData(data);
+});
+
+var loadData = function(data){
+	var url = "/managementdebugginghttpservice/service/getmonitorlogdetail";
+	$.ajax({
+		url : url,
+		type : "POST",
+		dataType : "json",
+		data : data,
+		contentType : "application/json",
+		error : function(request, textStatus, errorThrown){
+			$(".returnMessage").html("获取失败！");
+		},
+		success : function(result){
+			if (result == null){
+				return ;
+			}
+			var dataList = result['body'];
+			$.each(dataList, function(i, value) {
+				if (value != 'undefined') {
+					var tr = document.createElement("tr");
+					var cell_one = tr.insertCell();
+					cell_one.innerHTML = value.bid;
+					var cell_two = tr.insertCell();
+					cell_two.innerHTML = value.vin;
+
+					var cell_three = tr.insertCell();
+					cell_three.innerHTML = getServiceName(value.serviceName);
+
+					var cell_four = tr.insertCell();
+					cell_four.innerHTML = value.messageName;
+
+					var cell_five = tr.insertCell();
+					cell_five.innerHTML =  value.resultCode;
+
+					var cell_six = tr.insertCell();
+					var input = document.createElement('input');
+					input.type = 'button';
+					input.value = 'more';
+					input.id = "more_"+i;
+					input.onclick = function(event){
+						if($(this).val()=="more"){
+							$("[type='button']").attr('value','more');
+							$(this).attr('value','less');
+							showMore(value);
+						}else{
+							$("#returnMessage").hide();
+							$("[type='button']").attr('value','more');
+						}
+					}
+					cell_six.appendChild(input);
+					$("#panel_table").find("tbody").append(tr);
+				}
+				});
+		}
+	});
+};
+var showMore = function(value){
+	$("#returnMessage").show();
+	$("#serviceName").html(value.serviceName);
+	$("#messageName").html(value.messageName);
+	$("#vin").html(value.vin);
+	$("#bid").html(value.bid);
+	$("#resultCode").html(value.resultCode);
+	$("#resultDescription").html(getResultCode(value.resultCode+""));
+	$("#tboxMessageJsonString").html(value.tboxMessageJsonString);
+	$("#serviceDataHexString").html(value.serviceDataHexString);
+	$("#serviceDataResolution").html(value.serviceDataResolution);
+	$("#serviceDataExpectation").html(value.serviceDataExpectation);
+/* 	$("#serviceDataLength").html(value.serviceDataLength); */
+	$("#serviceVersion").html(value.serviceVersion);
+	$("#securityVersion").html(value.securityVersion);
+	$("#tboxMessageHexString").html(value.tboxMessageHexString);
+	$("#uplinkCount").html(value.uplinkCount);
+	$("#downlinkCount").html(value.downlinkCount);
+	$("#eventCreationTime").html(value.eventCreationTime);
+	$("#messageCreationTime").html(value.messageCreationTime);
+	$("#logRecordTime").html(value.logRecordTime);
+}	
+</script>
+</head>
+<body>
+	<div class="container-fluid" id="container-fluid-detail">
+		<div style="margin-bottom: 30px;">
+			<h3>详细服务错误日志信息</h3>
+		</div>
+		<table class="table table-bordered" id="panel_table" style="width: 100%">
+					<thead>
+						<tr>
+							<th>BID</th>
+							<th>车架号</th>
+							<th>服务名称</th>
+							<th>消息名称</th>
+							<th>失败原因代码</th>
+							<th>更多</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+		<div id="returnMessage">
+			<table class="table table-bordered" id="panel_table" style="width: 40%">
+				<tbody>
+					<tr>
+						<td style="width: 100px">服务名称</td>
+						<td id="serviceName"></td>
+					</tr>	
+					<tr>
+						<td style="width: 100px">消息名称</td>
+						<td id="messageName"></td>
+					</tr>	
+					<tr>
+						<td style="width: 100px">车架号</td>
+						<td id="vin"></td>
+					</tr>	
+					<tr>
+						<td style="width: 100px">BID</td>
+						<td id="bid"></td>
+					</tr>	
+					<tr>
+						<td style="width: 100px">失败原因代码</td>
+						<td id="resultCode"></td>
+					</tr>		
+						<tr>
+						<td style="width: 100px">错误代码描述</td>
+						<td id="resultDescription"></td>
+					</tr>	
+						<tr>
+						<td style="width: 100px">T-Box消息JSON字符串</td>
+						<td id="tboxMessageJsonString"></td>
+					</tr>	
+						<tr>
+						<td style="width: 100px">serviceData十六进制字符串</td>
+						<td id="serviceDataHexString"></td>
+					</tr>	
+						<tr>
+						<td style="width: 100px">serviceData解析结果</td>
+						<td id="serviceDataResolution"></td>
+					</tr>	
+					<tr>
+						<td style="width: 100px">serviceData预期结果</td>
+						<td id="serviceDataExpectation"></td>
+					</tr>		
+					<!-- 
+					<tr>
+						<td style="width: 100px">serviceData长度</td>
+						<td id="serviceDataResolution"></td>
+					</tr> 
+					-->		
+					<tr>
+						<td style="width: 100px">服务版本</td>
+						<td id="serviceVersion"></td>
+					</tr>
+					<tr>
+						<td style="width: 100px">秘钥版本</td>
+						<td id="securityVersion"></td>
+					</tr>
+					<tr>
+						<td style="width: 100px">T-Box消息十六进制字符串</td>
+						<td id="tboxMessageHexString"></td>
+					</tr>
+					<tr>
+						<td style="width: 100px">上行消息计数</td>
+						<td id="uplinkCount"></td>
+					</tr>
+					<tr>
+						<td style="width: 100px">下行消息计数</td>
+						<td id="downlinkCount"></td>
+					</tr>
+					<tr>
+						<td style="width: 100px">事件创建时间</td>
+						<td id="eventCreationTime"></td>
+					</tr>	
+					<tr>
+						<td style="width: 100px">消息创建时间</td>
+						<td id="messageCreationTime"></td>
+					</tr>	
+					<tr>
+						<td style="width: 100px">日志记录时间</td>
+						<td id="logRecordTime"></td>
+					</tr>	
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>

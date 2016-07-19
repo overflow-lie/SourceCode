@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nGTPDispatcherDataUnencrypted type="object"
+	class="NGTPDispatcherDataUnencrypted" asnclass="net.sirun.ngtp.ngtp_dispatch">
+
+	<messageCreationTime type="object" class="TimeStamp">
+		<seconds type="integer"></seconds>
+		<millis type="integer"></millis>
+	</messageCreationTime>
+	<messageTimeToLive type="integer"></messageTimeToLive>
+	<msgCounter type="object" class="MessageCounter">
+		<uplinkCount type="integer">
+		</uplinkCount>
+		<downlinkCount type="integer"></downlinkCount>
+	</msgCounter>
+	<vehicleIdentification type="object" mode="choice" ndfun="getChosenFlag"
+		choiceclass="VehicleIdentification">
+		<vin type="object" choice="1"  fun="getChosenValue" class="VIN">
+			<isowmi type="printablestring"></isowmi>
+			<isovds type="printablestring"></isovds>
+			<isovisModelyear type="printablestring"></isovisModelyear>
+			<isovisSeqPlant type="printablestring"></isovisSeqPlant>
+		</vin>
+		<driveID type="printablestring" choice="2"></driveID>
+		<equipmentId type="integer" choice="3"></equipmentId>
+		<equipmentSerial type="printablestring" choice="4"></equipmentSerial>
+	</vehicleIdentification>
+	<deviceIdentification type="printablestring"></deviceIdentification>
+</nGTPDispatcherDataUnencrypted>

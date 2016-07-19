@@ -1,0 +1,272 @@
+-- NGTP message format for Dispatching
+--
+--  version 3.1 (draft)
+--
+--  changes:
+--
+--  2010-10-17: Initial 2.0 draft release
+--  2011-03-03: Renamed 'iccId' to 'mobileId' and allow larger String values
+--              Renamed 'networkInfo' to 'currentNetwork'
+--              Renamed 'simInfo' to 'homeNetwork'
+--                Changed NetworkInfo data type to be generic string
+--              Added 'eventInitiator'
+--              Added 'millis' member to TimeStamp structure
+--  2011-05-17: Moved 'mobileId' to NGTPDispatcherDataCommon
+--              Changed 'mobileId' to structure with many possible attributes.
+--              Added 'messageCreationTime' attribute to NGTPDispatcherDataCommon.
+--  2012-02     Refactored to have an unencrypted part which can be used 
+--              as �nonce� in encryption/signing
+--  2013-02-18  Increased VehicleIdentification.equipmentSerial length from 17 to 20.
+--              Updated version to 3.1
+ NGTP-Dispatch
+ DEFINITIONS
+AUTOMATIC TAGS ::=
+BEGIN
+ --========================================================================
+--
+-- NGTPDispatcherData
+--
+--========================================================================
+ ProtocolVersionSingle4 ::= INTEGER (0..15)
+ProtocolVersionSingle8 ::= INTEGER (0..255)
+ --The protocol version(s) used in NGTP header.
+--Note: ERA uses Major version=0, so that should be avoided
+protocolMajorVersion ProtocolVersionSingle4::= 3
+protocolMinorVersion ProtocolVersionSingle4::= 1
+  -- This part is required by the encryption algorithm to be unencrypted
+-- Length must be at least 8 bytes, and the first 8 bytes should uniquely 
+-- identify the message in its message direction.
+ NGTPDispatcherDataUnencrypted ::= SEQUENCE {
+  -- Time when this message was created by the dispatcher part creator.
+  -- The sender must ensure that a timestamp is never reused for a specific car
+  messageCreationTime   TimeStamp,         --41bit
+  messageTimeToLive     INTEGER(0..2047),  --In steps of 10s. 0=no limit
+   --The message counter is incremented for each new message sent, except for the
+  --Dispatcher Ack where the received message counter is returned. Each side has its
+  --own message counter
+  msgCounter            MessageCounter,
+   --This field is added here to make it possible to identify the sender 
+  --even for an encrypted message over a public APN.
+  vehicleIdentification VehicleIdentification,
+   --This field is added here to make it possible to identify the sender 
+  --even for an encrypted message over a public APN.
+  deviceIdentification PrintableString (SIZE (20)) OPTIONAL
+}
+  NGTPDispatcherData ::= CHOICE {
+  uplink    UplinkNGTPDispatcherData,     -- for ServiceDataMessages
+  downlink  DownlinkNGTPDispatcherData,    -- for ServiceDataMessages
+  control   ControlNGTPDispatcherData     -- for both downlink and uplink
+}
+  UplinkNGTPDispatcherData ::= SEQUENCE {
+  common       NGTPDispatcherDataCommon,
+  extension    UplinkNGTPDispatcherDataExtension
+}
+ DownlinkNGTPDispatcherData ::= SEQUENCE {
+  common        NGTPDispatcherDataCommon,
+  extension     DownlinkNGTPDispatcherDataExtension
+}
+  ControlNGTPDispatcherData ::= SEQUENCE {
+  common      NGTPDispatcherDataCommon,
+  extension    ControlNGTPDispatcherDataExtension
+}
+   --========================================================================
+--
+-- NGTPNGTPDispatcherData Components (used by NGTPDispatcherData)
+--
+--========================================================================
+  NGTPDispatcherDataCommon ::= SEQUENCE {
+  --Where was the event started
+  eventInitiator        EventInitiator,   --1bit
+  eventCreationTime    TimeStamp,
+  
+  -- A value from ApplicationServiceType in separate asn.1 file  
+  serviceType          INTEGER (0..255),
+  
+  --backend EventId is not used, so generally omitted
+  --backendEventID       OCTET STRING (SIZE(22))    OPTIONAL,
+  messageType          DSPTMessageType,
+  dsptAckRequired      BOOLEAN,
+   -- statelessNGTPmessage TRUE is used in a message not expecting any response 
+  -- except for possibly an application acknowledge
+  statelessNGTPmessage BOOLEAN,
+   -- Identifier of the mobile radio device / nad. Can be MSISDN, MDN, MEID, ICC-ID, etc. Generally omitted.
+  mobileId             MobileDeviceIdentifier OPTIONAL,
+   --A random number selected by TU in a response to a shoulder tap. 
+  --TSP must then respond with the  same challenge in the dispatcher header
+  challenge            OCTET STRING (SIZE(6))  OPTIONAL
+}
+  UplinkNGTPDispatcherDataExtension ::= SEQUENCE {
+  --Only TRUE in eCall/bCall when requesting a voice call number
+  crqmRequest                    BOOLEAN,
+  messagePendingCheck            BOOLEAN,
+  --Basic position is generally to be omitted
+  basicPosition                  BasicPosition OPTIONAL,
+  --Generally omitted. 
+  currentNetwork                 PrintableString(SIZE(0..127)) OPTIONAL,
+  --Generally omitted. 
+  homeNetwork                    PrintableString(SIZE(0..127)) OPTIONAL,
+   --Language code according to ISO639-2. 
+  --Included only in assistance related services
+  hmiLanguage                    PrintableString (SIZE (3)) OPTIONAL, -- 
+   serviceDataMessageLength       MessageLength,
+  serviceDataEncoding            DataEncoding,
+  serviceDataProtocolVersion     MajMinVersion16
+}
+ DownlinkNGTPDispatcherDataExtension ::= SEQUENCE {
+  serviceDataMessageLength        MessageLength,
+  serviceDataEncoding             DataEncoding,
+  serviceDataProtocolVersion      MajMinVersion16  --See serviceDataMajor/MinorVersion
+}
+  ControlNGTPDispatcherDataExtension ::= SEQUENCE {
+  -- for ACK and CRQM. Phone number to be called by an assistance service
+  crqNumber              PrintableString(SIZE(0..27)) OPTIONAL, 
+   -- �Shoulder tap� to inform vehicle that it can fetch data from the TSP. Currently not used.   
+  notificationData       OCTET STRING(SIZE(1..64)) OPTIONAL,
+   --Indicates to TU that there are messages waiting to be delivered. 
+  --Used in response to message pending check
+  messagesPending        BOOLEAN  OPTIONAL,
+   errorInfo              NGTPErrorCodes OPTIONAL -- for error message
+}
+  --========================================================================
+-- Data Types used in NGTP-DSPT definition
+--========================================================================
+ MobileDeviceIdentifier ::= SEQUENCE {
+  -- e.g. MDN or MSISDN
+  publicAddress       PrintableString(SIZE(1..32)) OPTIONAL,
+  
+  -- e.g. MEID (14 hex digits) or IMEI (14-16 digits)
+  equipmentIdentifier PrintableString(SIZE(1..32)) OPTIONAL,
+  
+  -- e.g. MIN or IMSI
+  subscriberIdentity  PrintableString(SIZE(1..32)) OPTIONAL,
+  
+  -- ICCID or SIMRAVID
+  iccId               PrintableString(SIZE(1..32)) OPTIONAL
+  
+}
+  --Before factory test has completed, equipmentSerial or VIN is to be used depending 
+--on what is already know by the TSP (OEM specific. equipmentSerial is assumed). 
+--The same number is used until the unit is provisioned
+--A provisioned vehicle will use the equipmentId provisioned by the TSP
+ VehicleIdentification ::= CHOICE { 
+    vin            VIN,
+    --driveID can be used as an �anonymous� identifier. Currently not used.
+    driveID        PrintableString (SIZE(17)),
+    --Generic equipment id. Used if provisioned by TSP. 
+    equipmentId       INTEGER(0..4294967295),
+     --Equipment serial number
+    equipmentSerial   PrintableString (SIZE(20))
+}
+EventInitiator ::= ENUMERATED { 
+  tu      (0), 
+  backend (1) 
+}
+ DSPTMessageType ::= ENUMERATED {
+  error                  (0),
+  crqm                   (1),
+  upServiceData          (2),
+  downServiceData        (3),
+  dsptAck                (4),
+  notification           (5),
+  terminateVoice         (6),
+  terminateEvent         (7),
+  prepareForTerminate    (8),   -- mainly for SMS bearer
+  challenge              (9),
+  chRespServiceData      (10)
+} -- (0..31)
+ --TU increases uplinkCount for each new message sent and fills in the latest received
+--downlink count (last known at message generation time, so a later message may have been received).
+--Equivalent usage for backend except for switching uplink <-> downlink
+--If a message is resent on dispatcher level the counters remain untouched
+ MessageCounter ::= SEQUENCE {
+  uplinkCount     INTEGER (0..255),
+  downlinkCount   INTEGER (0..255)
+}
+  DataEncoding ::= SEQUENCE {
+  encodingType        EncodingType,    
+  encodingVersion     MajMinVersion6 -- This parameter is currently not used
+}
+  EncodingType ::= ENUMERATED {
+  asn1-per-aligned     (0),
+  asn1-per-unaligned   (1),
+  xml                  (2)
+}
+  MajMinVersion6 ::= SEQUENCE {
+  majorVersion    INTEGER(0..7),
+  minorVersion    INTEGER(0..7)
+}
+  NGTPErrorCodes ::= ENUMERATED {
+-- Error category should be defined later !!!     
+  dataMismatchError                (10), -- protocol ok, but vin error or efi ID unknown (only uplink)
+  protocolVersionError             (20), -- protocol not ok (only uplink)
+  messageLengthError               (30), -- message length not ok for DSPT or ServiceData part (only uplink)
+  eventTerminatedByTimeout         (40), -- (only uplink)
+  serviceTypeError                 (50), -- on DSPT level NOT application level (up/downlink)
+  serviceNotProvisioned            (51), -- (uplink) mainly for RS
+  crqNumberError                   (60), -- (uplink)
+  invalidHeader                    (70), -- (uplink)
+  reserved                         (80), -- (uplink/downlink), former DSPT internal server error
+  invalidSignature                 (90), -- (uplink/downlink)
+  invalidSecurityContext          (100), -- (uplink/downlink)
+  statelessExpected               (110), -- (downlink) statelessNGTPmessage is required             
+  unknownError                    (999) -- (uplink/downlink)
+}
+  MessageLength ::= CHOICE {
+  messageLength8     INTEGER(0..255),
+  messageLength16    INTEGER(0..65535),
+  messageLength24    INTEGER(0..16777215)
+}
+  TimeStamp ::= SEQUENCE {
+  seconds INTEGER(0..2147483647),  -- UTC seconds since January 1st, 2000, 00:00 (31 Bit)
+  millis  INTEGER(0..999) OPTIONAL -- Millisecond within the second
+}
+  BasicPosition ::= SEQUENCE {   -- format: milliarcsecond = degree / 3600000
+  latitude  INTEGER(-2147483648..2147483647), -- 32 bits
+  longitude INTEGER(-2147483648..2147483647)  -- 32 bits
+}
+ -- ASN PARSER BUG, DOES NOT UNDERSTAND VALUE ASSIGNMENT.
+-- The below is only so that it doesn�t complain about it.
+S32-SizeConstrainedInteger ::= INTEGER(-2147483648..2147483647)  -- 32 bits
+latitudeUnknown  S32-SizeConstrainedInteger::= 324000001
+longitudeUnknown S32-SizeConstrainedInteger::= 648000001
+-- LatitudeUnknown ::= INTEGER=324000001
+-- LongitudeUnknown ::= INTEGER=648000001
+ -- Maximum value Latitude = 90�00'00.000'' 
+-- = 90*60*60.000'' = 324000,000'' 
+-- = 324 000 000 Miliarcseconds
+-- = 0x134FD900
+-- Minimum value Latitude = -90�00'00.000'' 
+-- = -90*60*60.000'' = -324000.000'' 
+-- = -324 000 000 Miliarcseconds
+-- = 0xECB02700 
+-- Lat. unknown value 324 000 001 (0x134FD901)
+ -- Maximum value Longitude = 180�00'00.000'' 
+-- = 180*60*60.000'' = 648000.000'' 
+-- = 648 000 000 Miliarcseconds
+-- = 0x269FB200
+-- Minimum value Longitude = -180�00'00.000'' 
+-- = -180*60*60.000'' = -648000.000'' 
+-- = -648 000 000 Miliarcseconds
+-- = 0xD9604E00 
+-- Long. unknown value 648 000 001 (0x269FB201)
+ BOOLEXT ::= ENUMERATED {
+  isFalse       (0),
+  isTrue        (1),
+  isUnused      (2),
+  isUnknown     (3)
+}
+ Acknowledge ::= ENUMERATED {
+  nack    (0),
+  ack     (1)
+}
+   VIN ::= SEQUENCE {
+ isowmi PrintableString (SIZE(3)) OPTIONAL,         -- for long VIN
+ isovds PrintableString (SIZE(6)) OPTIONAL,         -- for long VIN
+ isovisModelyear PrintableString (SIZE(1)) OPTIONAL,-- for model year iso VIS 
+ isovisSeqPlant PrintableString (SIZE(7))           -- Mandatory 7-digit VIN (plant code +  sequential number)
+}
+   MajMinVersion16 ::= SEQUENCE {
+  majorVersion    ProtocolVersionSingle8,
+  minorVersion    ProtocolVersionSingle8
+}
+  END

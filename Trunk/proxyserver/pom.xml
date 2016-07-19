@@ -1,0 +1,365 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>hoperun</groupId>
+	<artifactId>proxyserver</artifactId>
+	<version>1002.01-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>Proxy服务</name>
+	<url>http://maven.apache.org</url>
+	<!-- 持续集成信息 -->
+	<ciManagement>
+		<system>Hudson</system>
+		<url>http://172.32.5.45/develop/hudson</url>
+		<notifiers>
+			<notifier>
+				<type>mail</type>
+				<sendOnError>true</sendOnError>
+				<sendOnFailure>true</sendOnFailure>
+				<sendOnSuccess>false</sendOnSuccess>
+				<sendOnWarning>false</sendOnWarning>
+				<address />
+				<configuration />
+			</notifier>
+		</notifiers>
+	</ciManagement>
+	<inceptionYear>2013</inceptionYear>
+	<!-- 邮件列表 -->
+	<mailingLists>
+		<mailingList>
+			<name>杨卫君</name>
+			<post>weijun.yang@sirun.net</post>
+			<subscribe>weijun.yang@sirun.net</subscribe>
+			<unsubscribe>weijun.yang@sirun.net</unsubscribe>
+			<archive>http://mail.sirun.net</archive>
+		</mailingList>
+		<mailingList>
+			<name>田阳</name>
+			<post>yang.tian@sirun.net</post>
+			<subscribe>yang.tiang@sirun.net</subscribe>
+			<unsubscribe>yang.tian@sirun.net</unsubscribe>
+			<archive>http://mail.sirun.net</archive>
+		</mailingList>
+	</mailingLists>
+	<!-- 开发者列表 -->
+	<developers>
+		<developer>
+			<id>yangweijun</id>
+			<name>杨卫君</name>
+			<email>weijun.yang@sirun.net</email>
+			<url />
+			<roles>
+				<role>项目经理</role>
+				<role>研发经理</role>
+			</roles>
+			<organization>斯润天朗(北京)科技有限公司</organization>
+			<organizationUrl>http://www.sirun.net</organizationUrl>
+			<properties />
+			<timezone>8</timezone>
+		</developer>
+		<developer>
+			<id>tianyang</id>
+			<name>田阳</name>
+			<email>yang.tian@sirun.net</email>
+			<url />
+			<roles>
+				<role>开发工程师</role>
+			</roles>
+			<organization>斯润天朗(北京)科技有限公司</organization>
+			<properties />
+			<timezone>8</timezone>
+		</developer>
+	</developers>
+	<!-- 贡献者列表 -->
+	<contributors>
+		<contributor>
+			<name>韩烁</name>
+			<email>shuo.han@sirun.net</email>
+			<url />
+			<roles>
+				<role>产品经理</role>
+			</roles>
+			<organization>斯润天朗(北京)科技有限公司</organization>
+			<properties />
+			<timezone>8</timezone>
+		</contributor>
+	</contributors>
+	<!-- 代码库 -->
+	<scm>
+		<connection>scm:svn:http://172.32.5.45/wcarTU/SvnPath/SourceCode/Trunk/proxyserver
+		</connection>
+		<developerConnection>scm:svn:http://172.32.5.45/TService/SvnPath/SourceCode/Trunk/proxyserver
+		</developerConnection>
+		<tag>HEAD</tag>
+		<url />
+	</scm>
+	<organization>
+		<name>斯润天朗(北京)科技有限公司</name>
+		<url>http://www.sirun.net</url>
+	</organization>
+	<!-- 构建 -->
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<scriptSourceDirectory />
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<outputDirectory>target/classes</outputDirectory>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.hbm.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.properties</include>
+				</includes>
+				<excludes>
+				    <exclude>log4j2.xml</exclude>
+				    <exclude>proxy.properties</exclude>
+				    <exclude>serviceproxyserver.sh</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<finalName>proxyserver</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.7.2</version>
+				<configuration>
+					<forkMode>once</forkMode>
+					<argLine>-Dfile.encoding=UTF-8</argLine>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/lib
+							</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<!-- 使用useUniqueVersions，避免遇到快照版， MANIFEST.MF文件中记录的时间戳版本 -->
+							<useUniqueVersions>false</useUniqueVersions>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>hoperun.proxyserver.bin.ProxyServerBootstrap</mainClass>
+
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+			    <artifactId>maven-antrun-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>copy-lib-src-webapps</id>
+			            <phase>package</phase>
+			            <configuration>
+			                <tasks>
+			                    <mkdir dir = "target/proxyserver" />
+			                    <mkdir dir = "target/proxyserver/lib" />
+			                    <mkdir dir = "target/proxyserver/log" />
+			                    <mkdir dir = "target/proxyserver/classes" />
+			                    <copy todir = "target/proxyserver/lib">
+			                        <fileset dir = "target/lib">
+			                            <include name = "*" />
+			                        </fileset>
+			                        <fileset dir = "target">
+			                            <include name = "proxyserver.jar" />
+			                        </fileset>
+			                    </copy>
+			                    <copy todir = "target/proxyserver/classes">
+			                        <fileset dir = "src/main/resources">
+			                            <include name = "log4j2.xml" />
+			                            <include name = "proxy.properties" />
+			                        </fileset>
+			                    </copy>
+			                    <copy todir = "target/proxyserver">
+			                        <fileset dir = "src/main/resources">
+			                            <include name = "serviceproxyserver.sh" />
+			                        </fileset>
+			                    </copy>
+			                    
+			                    
+			                    <mkdir dir = "target/proxyserver-rel" />
+			                    <mkdir dir = "target/proxyserver-rel/lib" />
+			                    <mkdir dir = "target/proxyserver-rel/log" />
+			                    <mkdir dir = "target/proxyserver-rel/classes" />
+			                    <copy todir = "target/proxyserver-rel/lib">
+			                        <fileset dir = "target/lib">
+			                            <include name = "*" />
+			                        </fileset>
+			                        <fileset dir = "target">
+			                            <include name = "proxyserver.jar" />
+			                        </fileset>
+			                    </copy>
+			                    <copy todir = "target/proxyserver-rel/classes">
+			                        <fileset dir = "src/main/assembly/configbuild/rel">
+			                            <include name = "log4j2.xml" />
+			                            <include name = "proxy.properties" />
+			                        </fileset>
+			                    </copy>
+			                    <copy todir = "target/proxyserver-rel">
+			                        <fileset dir = "src/main/assembly/configbuild/rel">
+			                            <include name = "serviceproxyserver.sh" />
+			                        </fileset>
+			                    </copy>
+			                </tasks>
+			            </configuration>
+			            <goals>
+			                <goal>run</goal>			                
+			            </goals>
+			        </execution>
+			    </executions>			    
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.1</version>
+					<configuration>
+						<url>http://localhost:8080/manager/html</url>
+						<server>tomcat</server>
+						<uriEncoding>UTF-8</uriEncoding>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>项目组内部仓库</name>
+			<url>http://172.32.5.45/artifactory/repo</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>snapshots</id>
+			<name>项目组内部仓库</name>
+			<url>http://172.32.5.45/artifactory/repo</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>central</id>
+			<name>项目组内部仓库</name>
+			<url>http://172.32.5.45/artifactory/repo</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>snapshots</id>
+			<name>项目组内部仓库</name>
+			<url>http://172.32.5.45/artifactory/repo</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.0.17.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.0-beta9</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.4</version>
+			<classifier>jdk15</classifier>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.2.2</version>
+			<type>java-source</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.1.37</version>
+		</dependency>
+		<dependency>
+			<groupId>hoperun</groupId>
+			<artifactId>util</artifactId>
+			<version>1001.01-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>hoperun</groupId>
+			<artifactId>proxytrans</artifactId>
+			<version>1001.01-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java-version>1.7</java-version>
+	</properties>
+</project>
